@@ -1,21 +1,49 @@
 package com.jlox.scanner;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.jlox.error.IErrorReporter;
 import com.jlox.scanner.source.ISource;
 import com.jlox.scanner.source.ISourceInfo;
 
+
 public class LoxScanner {
+
+    // Error Codes
+    public static final String ERROR_UNTERMSTRING = "ERR_UNTERMINATED_STRING";
+    public static final String ERROR_UNKOWNCHAR = "ERR_UNKNOWN_CHAR";
+    private static final Map<String, TokenType> keywords;
+    static {
+        keywords = new HashMap<>();
+        keywords.put("and", TokenType.AND);
+        keywords.put("class", TokenType.CLASS);
+        keywords.put("else", TokenType.ELSE);
+        keywords.put("false", TokenType.FALSE);
+        keywords.put("for", TokenType.FOR);
+        keywords.put("fun", TokenType.FUN);
+        keywords.put("if", TokenType.IF);
+        keywords.put("nil", TokenType.NIL);
+        keywords.put("or", TokenType.OR);
+        keywords.put("print", TokenType.PRINT);
+        keywords.put("return", TokenType.RETURN);
+        keywords.put("super", TokenType.SUPER);
+        keywords.put("this", TokenType.THIS);
+        keywords.put("true", TokenType.TRUE);
+        keywords.put("var", TokenType.VAR);
+        keywords.put("while", TokenType.WHILE);
+    }
+
 
     private final ISource source;
     private final IErrorReporter reporter;
     private final List<Token> tokens;
-
     // A source with extra information for error reporting
     private final ISourceInfo sourceI;
     private final boolean hasInfo;
+
 
     public LoxScanner(ISource source, IErrorReporter reporter) {
         this.source = source;
@@ -40,12 +68,13 @@ public class LoxScanner {
 
     private void scanToken() {
         char c = source.advance();
-        // Check if it is a white space character (not including '\n')
+        // Use the handleMethods to deal with the char
+        // The order of the handlers matter (the first three must remain as-is and handle unkown should always
+        // come last. The rest can be switched around).
         boolean handeled = handleWhiteSpace(c);
         if (handeled) {
             return;
         }
-        // Check if it is a single character token
         handeled = handleSingleChar(c);
         if (handeled) {
             return;
@@ -54,10 +83,25 @@ public class LoxScanner {
         if (handeled) {
             return;
         }
-        handeled = handleMultiChar(c);
-        if (!handeled) {
-            handleUnknown(c);
+        handeled = handleSlash(c);
+        if (handeled) {
+            return;
         }
+        handeled = handleString(c);
+        if (handeled) {
+            return;
+        }
+        handeled = handleNumbers(c);
+        if (handeled) {
+            return;
+        }
+
+        handeled = handleIdentifiers(c);
+        if (handeled) {
+            return;
+        }
+        // If all other handleres don't know what to do, report the char as an error
+        handleUnknown(c);
     }
 
     // Check if it is a white space character (excluding '\n')
@@ -134,8 +178,7 @@ public class LoxScanner {
         return true;
     }
 
-    // Handle other types of tokens
-    private boolean handleMultiChar(char c) {
+    private boolean handleSlash(char c) {
         if (c == '/') {
             if (nextMatch('/')) {
                 // Two '//' indicate a comment. Move forward till we hit the end of the line or
@@ -147,22 +190,16 @@ public class LoxScanner {
             addToken(TokenType.SLASH);
             return true;
         }
-        if (c == '"') {
-            handleString();
-            return true;
-        }
-        if (Character.isDigit(c)) {
-            handleNumbers(c);
-            return true;
-        }
         return false;
     }
 
-    private void handleString() {
+    private boolean handleString(char c) {
         // 2 since we have consumed the initial ' " ' to get here and we just advanced
         // in the previous line
+        if (c != '"')
+            return false;
         int length = 1;
-        char last = '\0';
+        char last = c;
         while (!source.isAtEnd() && source.peek() != '"') {
             length++;
             last = source.advance();
@@ -174,24 +211,19 @@ public class LoxScanner {
         }
         int offset = source.getOffset();
         if (last != '"')
-            reporter.error(source.getOffset(), "Unterminated string");
+            reporter.error("Unterminated string",ERROR_UNTERMSTRING);
 
         String literal = source.get((offset - length) + 2, offset);
 
         addToken(TokenType.STRING, literal, length);
+        return true;
     }
 
-    private void handleUnknown(char c) {
-        if (hasInfo) {
-            assert sourceI != null;
-            reporter.error(source.getOffset(), String.format("Unexpected char %c at line %d col %d", c,
-                    sourceI.getLineNumber(), sourceI.getColNumber()));
-        }
-        else
-            reporter.error(source.getOffset(), String.format("Unexpected char %c", c));
-    }
+    private boolean handleNumbers(char c) {
 
-    private void handleNumbers(char c) {
+        if (!Character.isDigit(c))
+            return  false;
+
         boolean isFloat = false;
         int length = 1;
         // Avoid repeated calls to source.peek()
@@ -206,14 +238,41 @@ public class LoxScanner {
         int offsetPlusOne = source.getOffset() + 1;
         // offsetPlusOne because offset returns a 0-indexed position
         String literal = source.get((offsetPlusOne - length), offsetPlusOne);
-        if (source.peek() == 'f') {
+        if (source.peek() == 'd') {
             isFloat = true;
             source.advance();
+            length++;
         }
         if (isFloat)
-            addToken(TokenType.FLOAT, Double.parseDouble(literal), length);
+            addToken(TokenType.DOUBLE, Double.parseDouble(literal), length);
         else
             addToken(TokenType.INTEGER, Integer.parseInt(literal), length);
+        return true;
+    }
+    // Handle keywords and identifiers
+    private boolean handleIdentifiers(char c) {
+        if (!Character.isAlphabetic(c))
+            return false;
+
+        int length = 1;
+        while (Character.isAlphabetic(source.peek()) || Character.isDigit(source.peek())) {
+            source.advance();
+            length++;
+        }
+        String identifier = source.get((source.getOffset()  - length) + 1, source.getOffset() + 1);
+        TokenType type = keywords.getOrDefault(identifier, TokenType.IDENTIFIER);
+        addToken(type, null, length);
+        return true;
+    }
+    // Handle tokens that don't fit anywhere else
+    private void handleUnknown(char c) {
+        if (hasInfo) {
+            assert sourceI != null;
+            reporter.error(String.format("Unexpected char %c at line %d col %d", c,
+                sourceI.getLineNumber(), sourceI.getColNumber()), ERROR_UNKOWNCHAR);
+        }
+        else
+            reporter.error(String.format("Unexpected char %c", c), ERROR_UNKOWNCHAR);
     }
 
     // Add a single/double-length token

@@ -1,7 +1,6 @@
 package com.jlox.error;
 
 public interface IErrorReporter {
-    void error(int offset, String message);
-
+    void error(String message, String code);
     boolean hasError();
 }
