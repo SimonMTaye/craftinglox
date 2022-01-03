@@ -59,25 +59,37 @@ public class StringSource implements ISourceInfo {
         return col;
     }
 
-    // TODO Make more efficent
     @Override
     public int getLineNumber(int offset) {
-        String str = getString().substring(0, offset);
-        String[] lines = str.split("\n");
-        return lines.length;
+        String myString = getString();
+        int l = myString.length();
+        if (offset >= l)
+            throw new RuntimeException("Offset is invalid");
+
+        int acc = 1;
+        // Count the number of times we see a new line
+        for (int i = 0; i <= offset; i++)
+            acc++;
+        return acc;
+
     }
 
     protected String getString() {
         return source;
     }
 
-    // TODO Make more efficient
     @Override
     public int getColNumber(int offset) {
-        String str = getString().substring(0, offset);
-        String[] lines = str.split("\n");
-        String last = lines[lines.length - 1];
-        return last.length();
+        String myString = getString();
+        int l = myString.length();
+        if (offset >= l)
+            throw new RuntimeException("Offset is invalid");
+
+        myString = myString.substring(0, offset);
+        // Get the position of the last new line
+        int fin = myString.lastIndexOf('\n');
+        // return the distance between that new line and our offset character
+        return (offset - fin);
     }
 
 }
