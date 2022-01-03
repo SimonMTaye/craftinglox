@@ -35,7 +35,7 @@ public class LineSource extends StringSource {
 
     @Override
     public int getColNumber(int offset) {
-        return offset;
+        return offset + 1;
     }
 
 }
