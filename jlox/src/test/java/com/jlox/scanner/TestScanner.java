@@ -5,8 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
-import com.jlox.error.ConsoleReporter;
-import com.jlox.error.IErrorReporter;
+import com.jlox.error.ConsoleHandler;
+import com.jlox.error.IErrorHandler;
 import com.jlox.scanner.source.ISource;
 import com.jlox.scanner.source.LineSource;
 
@@ -16,7 +16,7 @@ public class TestScanner {
 
     private List<Token> runScanner(String input) {
         ISource line = new LineSource(input);
-        IErrorReporter error = new ConsoleReporter();
+        IErrorHandler error = new ConsoleHandler();
 
         LoxScanner scanner = new LoxScanner(line, error);
         return scanner.scanTokens();

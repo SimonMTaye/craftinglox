@@ -1,6 +1,6 @@
 package com.jlox.error;
 
-public class ConsoleReporter implements IErrorReporter {
+public class ConsoleHandler implements IErrorHandler {
 
     private boolean hasError = false;
 

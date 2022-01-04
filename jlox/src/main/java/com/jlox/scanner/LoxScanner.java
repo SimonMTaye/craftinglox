@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.jlox.error.IErrorReporter;
+import com.jlox.error.IErrorHandler;
 import com.jlox.scanner.source.ISource;
 import com.jlox.scanner.source.ISourceInfo;
 
@@ -38,14 +38,14 @@ public class LoxScanner {
 
 
     private final ISource source;
-    private final IErrorReporter reporter;
+    private final IErrorHandler reporter;
     private final List<Token> tokens;
     // A source with extra information for error reporting
     private final ISourceInfo sourceI;
     private final boolean hasInfo;
 
 
-    public LoxScanner(ISource source, IErrorReporter reporter) {
+    public LoxScanner(ISource source, IErrorHandler reporter) {
         this.source = source;
         if (source instanceof ISourceInfo) {
             sourceI = (ISourceInfo) source;
