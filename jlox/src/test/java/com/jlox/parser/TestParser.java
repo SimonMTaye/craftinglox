@@ -173,4 +173,20 @@ public class TestParser {
         // End of checks. While this is not exhaustive,
         // it is unlikely that there will be errors we haven't caught already
     }
+
+    @Test
+    void TestComma() {
+        ArrayList<Token> tokens = new ArrayList<>();
+        IErrorHandler handler = new CollectorHandler();
+        IParser<Expression> parser = new ParseExpression(handler);
+        // 1,2
+        tokens.add(new Token(TokenType.INTEGER, "1", null, 1));
+        tokens.add(new Token(TokenType.COMMA, ",", null, 1));
+        tokens.add(new Token(TokenType.INTEGER, "2", null, 1));
+
+        Expression result = parser.parse(tokens);
+
+        assertInstanceOf(Binary.class, result, "Expect evaluated expression to be a binary");
+        assertEquals(TokenType.COMMA, ((Binary) result).operator.type);
+    }
 }

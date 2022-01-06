@@ -54,7 +54,12 @@ public class ParseExpression implements IParser<Expression> {
     }
 
     private Expression expression() {
-        return ternary();
+        return comma();
+    }
+
+    // comma -> ternary (',' ternary) *
+    private Expression comma() {
+        return binaryHelper((Void none) -> ternary(), TokenType.COMMA);
     }
     // ternary -> equality ? ternary : ternary | equality
     private Expression ternary() {
