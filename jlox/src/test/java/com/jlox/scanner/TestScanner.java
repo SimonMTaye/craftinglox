@@ -21,6 +21,22 @@ public class TestScanner {
         LoxScanner scanner = new LoxScanner(line, error);
         return scanner.scanTokens();
     }
+
+    @Test
+    void TestSingleCharScanner() {
+        List<Token> tokens = runScanner(". ? : ;");
+        assertEquals(5, tokens.size());
+
+        Token token1 = new Token(TokenType.DOT, ".", null, 0);
+        Token token2 = new Token(TokenType.QUESTION_MARK, "?", null, 2);
+        Token token3 = new Token(TokenType.COLON, ":", null, 4);
+        Token token4 = new Token(TokenType.SEMICOLON, ";", null, 6);
+
+        assertEquals(token1, tokens.get(0));
+        assertEquals(token2, tokens.get(1));
+        assertEquals(token3, tokens.get(2));
+        assertEquals(token4, tokens.get(3));
+    }
     @Test
     void TestIdentifier() {
         List<Token> tokens = runScanner("word and orchid");

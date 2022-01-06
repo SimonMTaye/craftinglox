@@ -15,8 +15,26 @@ public class LoxScanner {
     // Error Codes
     public static final String ERROR_UNTERMSTRING = "ERR_UNTERMINATED_STRING";
     public static final String ERROR_UNKOWNCHAR = "ERR_UNKNOWN_CHAR";
+
+    private static final Map<Character, TokenType> singleCharTokens;
     private static final Map<String, TokenType> keywords;
     static {
+        // Single Char List
+        singleCharTokens = new HashMap<>();
+        singleCharTokens.put('(', TokenType.LEFT_PAREN);
+        singleCharTokens.put(')', TokenType.RIGHT_PAREN);
+        singleCharTokens.put('{', TokenType.LEFT_BRACE);
+        singleCharTokens.put('}', TokenType.RIGHT_BRACE);
+        singleCharTokens.put('.', TokenType.DOT);
+        singleCharTokens.put(',', TokenType.COMMA);
+        singleCharTokens.put('-', TokenType.MINUS);
+        singleCharTokens.put('+', TokenType.PLUS);
+        singleCharTokens.put('*', TokenType.STAR);
+        singleCharTokens.put(';', TokenType.SEMICOLON);
+        singleCharTokens.put('\n', TokenType.NEW_LINE);
+        singleCharTokens.put('?', TokenType.QUESTION_MARK);
+        singleCharTokens.put(':', TokenType.COLON);
+        // Keyword list
         keywords = new HashMap<>();
         keywords.put("and", TokenType.AND);
         keywords.put("class", TokenType.CLASS);
@@ -117,43 +135,10 @@ public class LoxScanner {
     }
 
     private boolean handleSingleChar(char c) {
-        switch (c) {
-            case '(':
-                addToken(TokenType.LEFT_PAREN);
-                break;
-            case ')':
-                addToken(TokenType.RIGHT_PAREN);
-                break;
-            case '{':
-                addToken(TokenType.LEFT_BRACE);
-                break;
-            case '}':
-                addToken(TokenType.RIGHT_BRACE);
-                break;
-            case ',':
-                addToken(TokenType.COMMA);
-                break;
-            case '.':
-                addToken(TokenType.DOT);
-                break;
-            case '-':
-                addToken(TokenType.MINUS);
-                break;
-            case '+':
-                addToken(TokenType.PLUS);
-                break;
-            case '*':
-                addToken(TokenType.STAR);
-                break;
-            case ';':
-                addToken(TokenType.SEMICOLON);
-                break;
-            case '\n':
-                addToken(TokenType.NEW_LINE);
-                break;
-            default:
-                return false;
-        }
+        TokenType type = singleCharTokens.getOrDefault(c, null);
+        if (type == null)
+            return false;
+        addToken(type);
         return true;
     }
 
