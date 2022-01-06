@@ -11,6 +11,12 @@ public class ConsoleHandler implements IErrorHandler {
 
     }
 
+    public void error(Error error) {
+        hasError = true;
+        System.out.println(error.getMessage());
+
+    }
+
     @Override
     public boolean hasError() {
         return hasError;

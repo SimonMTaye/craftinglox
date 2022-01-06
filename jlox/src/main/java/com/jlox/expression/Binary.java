@@ -3,9 +3,9 @@ package com.jlox.expression;
 import com.jlox.scanner.Token;
 
 public class Binary extends Expression {
-	final Expression left;
-	final Token operator;
-	final Expression right;
+	public final Expression left;
+	public final Token operator;
+	public final Expression right;
 
 	public Binary (Expression left, Token operator, Expression right) {
 		this.left = left;
@@ -13,7 +13,7 @@ public class Binary extends Expression {
 		this.right = right;
 	}
 
-	public <R> R accept(Visitor<R> visitor) {
+	public <R> R accept(ExpressionVisitor<R> visitor) {
 		return visitor.visitBinary(this);
 	}
 }

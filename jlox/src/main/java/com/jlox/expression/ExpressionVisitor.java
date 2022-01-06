@@ -1,6 +1,6 @@
 package com.jlox.expression;
 
-interface Visitor<R> {
+interface ExpressionVisitor<R> {
 	R visitBinary(Binary binary);
 	R visitGrouping(Grouping grouping);
 	R visitLiteral(Literal literal);

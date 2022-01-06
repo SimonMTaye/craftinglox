@@ -4,12 +4,12 @@ import java.util.Objects;
 
 public class Token {
 
-    final TokenType type;
-    final String lexme;
-    final Object literal;
-    final int offset;
+    public final String lexme;
+    public final Object literal;
+    public final TokenType type;
+    public final int offset;
 
-    Token(TokenType type, String lexme, Object literal, int offset) {
+    public Token(TokenType type, String lexme, Object literal, int offset) {
         this.type = type;
         this.lexme = lexme;
         this.literal = literal;
