@@ -54,26 +54,41 @@ public class ParseExpression implements IParser<Expression> {
     }
 
     private Expression expression() {
-        return equality();
+        return ternary();
     }
-
+    // ternary -> equality ? ternary : ternary | equality
+    private Expression ternary() {
+        Expression expr = equality();
+        if (check(TokenType.QUESTION_MARK)) {
+            tokens.advance();
+            Expression left = ternary();
+            if (check(TokenType.COLON)) {
+                tokens.advance();
+                Expression right = ternary();
+                return new Ternary(expr, left, right);
+            }
+            throw  new ParseError("Expected ':' to match '?'", ParseErrorCode.MISSING_COLON, tokens.previous().offset);
+        }
+        return expr;
+    }
+    // equality -> comparison ( ('!=' | '==') comparison) *
     private Expression equality() {
         return binaryHelper((Void none) -> comparison(), TokenType.BANG_EQUAL, TokenType.EQUAL_EQUAL);
     }
-
+    // comparison -> term ( ('>' | '>=' | '<' | '<=' ) term) *
     private Expression comparison() {
         return binaryHelper((Void none) -> term(), TokenType.GREATER, TokenType.GREATER_EQUAL, TokenType.LESS, TokenType.LESS_EQUAL);
 
     }
-
+    // term -> factor ( ('-' | '+') factor ) *
     private Expression term() {
         return binaryHelper((Void none) -> factor(), TokenType.MINUS, TokenType.PLUS);
     }
-
+    // factor -> unary ( ('/' | '*') unary ) *
     private Expression factor() {
         return binaryHelper((Void none) -> unary(), TokenType.SLASH, TokenType.STAR);
     }
-
+    // unary -> ('!' | '-') unary | primary
     private Expression unary() {
         if (checkMultiple(TokenType.BANG, TokenType.MINUS)) {
             Token operator = tokens.advance();
@@ -81,7 +96,7 @@ public class ParseExpression implements IParser<Expression> {
         }
         return primary();
     }
-
+    // primary -> NUMBER | STRING | 'true | 'false' | 'nil' | '(' expression ')'
     private Expression primary() {
         if (checkMultiple(TokenType.INTEGER, TokenType.DOUBLE, TokenType.STRING, TokenType.TRUE, TokenType.FALSE, TokenType.NIL)) {
             Token token = tokens.advance();
@@ -100,6 +115,7 @@ public class ParseExpression implements IParser<Expression> {
         throw new ParseError("Expected an expression", ParseErrorCode.NO_EXPRESSION, tokens.previous().offset);
     }
 
+    // Helper method for matching pattern used in equality, comparison, term and factor
     private Expression binaryHelper(Function<Void, Expression> operand, TokenType... operators) {
         Expression expr = operand.apply(null);
         // Get the next token if it matches what we want

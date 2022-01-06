@@ -103,4 +103,74 @@ public class TestParser {
         assertInstanceOf(Binary.class, binary.right);
         assertEquals(TokenType.SLASH, ((Binary) binary.right).operator.type);
     }
+
+    @Test
+    void TestTernary() {
+        ArrayList<Token> tokens = new ArrayList<>();
+        IErrorHandler handler = new CollectorHandler();
+        IParser<Expression> parser = new ParseExpression(handler);
+        // Simple ternary expression
+        tokens.add(new Token(TokenType.FALSE, "false", null, 1));
+        tokens.add(new Token(TokenType.QUESTION_MARK, "?", null, 1));
+        tokens.add(new Token(TokenType.INTEGER, "10", null, 1));
+        tokens.add(new Token(TokenType.COLON, ":", null, 1));
+        tokens.add(new Token(TokenType.INTEGER, "1", null, 1));
+
+        Expression result = parser.parse(tokens);
+
+        assertInstanceOf(Ternary.class, result, "Expect evaluated expression to be a ternary");
+        assertInstanceOf(Literal.class, ((Ternary) result).condition);
+        assertInstanceOf(Literal.class, ((Ternary) result).left);
+        assertInstanceOf(Literal.class, ((Ternary) result).right);
+    }
+
+    @Test
+    void TestNestedTernary() {
+        ArrayList<Token> tokens = new ArrayList<>();
+        IErrorHandler handler = new CollectorHandler();
+        IParser<Expression> parser = new ParseExpression(handler);
+        // false ? (false ? (false ? 1 : 2) : 3) : (true ? 4 : 5)
+        tokens.add(new Token(TokenType.FALSE, "false", null, 1));
+        tokens.add(new Token(TokenType.QUESTION_MARK, "?", null, 1));
+
+        tokens.add(new Token(TokenType.FALSE, "false", null, 1));
+        tokens.add(new Token(TokenType.QUESTION_MARK, "?", null, 1));
+
+        tokens.add(new Token(TokenType.FALSE, "false", null, 1));
+        tokens.add(new Token(TokenType.QUESTION_MARK, "?", null, 1));
+
+        tokens.add(new Token(TokenType.INTEGER, "1", null, 1));
+        tokens.add(new Token(TokenType.COLON, ":", null, 1));
+
+        tokens.add(new Token(TokenType.INTEGER, "2", null, 1));
+        tokens.add(new Token(TokenType.COLON, ":", null, 1));
+
+        tokens.add(new Token(TokenType.INTEGER, "3", null, 1));
+        tokens.add(new Token(TokenType.COLON, ":", null, 1));
+
+        tokens.add(new Token(TokenType.FALSE, "true", null, 1));
+        tokens.add(new Token(TokenType.QUESTION_MARK, "?", null, 1));
+
+        tokens.add(new Token(TokenType.INTEGER, "4", null, 1));
+        tokens.add(new Token(TokenType.COLON, ":", null, 1));
+        tokens.add(new Token(TokenType.INTEGER, "5", null, 1));
+
+        Expression result = parser.parse(tokens);
+        assertInstanceOf(Ternary.class, result, "Expect evaluated expression to be a ternary");
+
+        Ternary first = (Ternary) result;
+        assertInstanceOf(Literal.class, first.condition, "Expect evaluated expression to be a ternary");
+        assertInstanceOf(Ternary.class, first.left, "Expect evaluated expression to be a ternary");
+        assertInstanceOf(Ternary.class, first.right, "Expect evaluated expression to be a ternary");
+
+        Ternary right = (Ternary) first.right;
+        assertInstanceOf(Literal.class, right.left, "Expect right.left expression to be a literal");
+        assertInstanceOf(Literal.class, right.right, "Expect left.right expression to be a literal");
+
+        Ternary left = (Ternary) first.left;
+        assertInstanceOf(Literal.class, left.right, "Expect left.right expression to be a literal");
+        assertInstanceOf(Ternary.class, left.left, "Expect left.right expression to be a literal");
+        // End of checks. While this is not exhaustive,
+        // it is unlikely that there will be errors we haven't caught already
+    }
 }

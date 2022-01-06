@@ -12,6 +12,15 @@ public class AstPrinter implements ExpressionVisitor<String> {
     }
 
     @Override
+    public String visitTernary(Ternary ternary) {
+        return String.format("(if %s %s else %s)",
+            ternary.condition.accept(this),
+            ternary.left.accept(this),
+            ternary.right.accept(this)
+        );
+    }
+
+    @Override
     public String visitGrouping(Grouping grouping) {
         return String.format("(%s)", grouping.expr.accept(this));
     }
