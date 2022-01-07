@@ -47,7 +47,7 @@ public class ParseExpression implements IParser<Expression> {
     private Expression parse() {
         try {
             return expression();
-        } catch (ParseError error) {
+        } catch (ParseLoxError error) {
             errorHandler.error(error);
             return null;
         }
@@ -72,7 +72,7 @@ public class ParseExpression implements IParser<Expression> {
                 Expression right = ternary();
                 return new Ternary(expr, left, right);
             }
-            throw  new ParseError("Expected ':' to match '?'", ParseErrorCode.MISSING_COLON, tokens.previous().offset);
+            throw  new ParseLoxError("Expected ':' to match '?'", ParseErrorCode.MISSING_COLON, tokens.previous().offset);
         }
         return expr;
     }
@@ -115,9 +115,9 @@ public class ParseExpression implements IParser<Expression> {
                 tokens.advance();
                 return grouping;
             }
-            throw new ParseError("Expected a ')'", ParseErrorCode.UNCLOSED_PAREN, tokens.previous().offset);
+            throw new ParseLoxError("Expected a ')'", ParseErrorCode.UNCLOSED_PAREN, tokens.previous().offset);
         }
-        throw new ParseError("Expected an expression", ParseErrorCode.NO_EXPRESSION, tokens.previous().offset);
+        throw new ParseLoxError("Expected an expression", ParseErrorCode.NO_EXPRESSION, tokens.previous().offset);
     }
 
     // Helper method for matching pattern used in equality, comparison, term and factor

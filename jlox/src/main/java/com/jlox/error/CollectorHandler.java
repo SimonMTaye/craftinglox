@@ -7,22 +7,22 @@ import java.util.ArrayList;
  */
 public class CollectorHandler implements IErrorHandler {
 
-    private final ArrayList<Error> reportedErrors = new ArrayList<>();
+    private final ArrayList<LoxError> reportedLoxErrors = new ArrayList<>();
 
     @Override
     public void error(String message, String code) {
-        Error err = new Error(message, code, -1);
-        reportedErrors.add(err);
+        LoxError err = new LoxError(message, code, -1);
+        reportedLoxErrors.add(err);
 
     }
 
     @Override
-    public void error(Error error) {
-        reportedErrors.add(error);
+    public void error(LoxError loxError) {
+        reportedLoxErrors.add(loxError);
     }
 
     @Override
     public boolean hasError() {
-        return !(reportedErrors.size() == 0);
+        return !(reportedLoxErrors.size() == 0);
     }
 }

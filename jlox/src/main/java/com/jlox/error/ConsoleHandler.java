@@ -11,9 +11,9 @@ public class ConsoleHandler implements IErrorHandler {
 
     }
 
-    public void error(Error error) {
+    public void error(LoxError loxError) {
         hasError = true;
-        System.out.println(error.getMessage());
+        System.out.println(loxError.getMessage());
 
     }
 
