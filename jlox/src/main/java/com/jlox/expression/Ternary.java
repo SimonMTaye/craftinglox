@@ -12,7 +12,7 @@ public class Ternary extends Expression {
     }
 
     @Override
-    <R> R accept(ExpressionVisitor<R> v) {
+    public <R> R accept(ExpressionVisitor<R> v) {
         return v.visitTernary(this);
     }
 }
