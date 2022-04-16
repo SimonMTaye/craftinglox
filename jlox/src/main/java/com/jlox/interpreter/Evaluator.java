@@ -42,6 +42,10 @@ public class Evaluator implements ExpressionVisitor<Object> {
             case SLASH:
             case STAR:
             case MINUS:
+            case GREATER:
+            case GREATER_EQUAL:
+            case LESS_EQUAL:
+            case LESS:
                 return operate(left, right, binary.operator);
             case PLUS: {
                 if (left instanceof String || right instanceof String)
@@ -108,6 +112,14 @@ public class Evaluator implements ExpressionVisitor<Object> {
                 }
                 return left / right;
             }
+            case GREATER:
+                return left > right;
+            case GREATER_EQUAL:
+                return left >= right;
+            case LESS_EQUAL:
+                return left <= right;
+            case LESS:
+                return left < right;
         }
         return null;
     }
@@ -126,6 +138,14 @@ public class Evaluator implements ExpressionVisitor<Object> {
                 }
                 return left / right;
             }
+            case GREATER:
+                return left > right;
+            case GREATER_EQUAL:
+                return left >= right;
+            case LESS_EQUAL:
+                return left <= right;
+            case LESS:
+                return left < right;
         }
         return null;
     }

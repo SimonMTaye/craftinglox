@@ -56,7 +56,7 @@ public class TestParser {
     }
 
     @Test
-    void TestBinary() {
+    void TestTerm() {
         ArrayList<Token> tokens = new ArrayList<>();
         IErrorHandler handler = new CollectorHandler();
         IParser<Expression> parser = new ParseExpression(handler);
@@ -71,6 +71,7 @@ public class TestParser {
 
     }
 
+    // Tests factor, grouping, term and equality
     @Test
     void TestMultiple() {
         ArrayList<Token> tokens = new ArrayList<>();
@@ -188,5 +189,22 @@ public class TestParser {
 
         assertInstanceOf(Binary.class, result, "Expect evaluated expression to be a binary");
         assertEquals(TokenType.COMMA, ((Binary) result).operator.type);
+    }
+
+    @Test
+    void TestComparison() {
+        ArrayList<Token> tokens = new ArrayList<>();
+        IErrorHandler handler = new CollectorHandler();
+        IParser<Expression> parser = new ParseExpression(handler);
+
+        tokens.add(new Token(TokenType.INTEGER, "10", 10, 0));
+        tokens.add(new Token(TokenType.GREATER, ">", 5, 0));
+        tokens.add(new Token(TokenType.INTEGER, "5", 5, 0));
+
+        Expression result = parser.parse(tokens);
+        assertInstanceOf(Binary.class, result);
+        assertEquals(TokenType.GREATER, ((Binary) result).operator.type);
+
+
     }
 }

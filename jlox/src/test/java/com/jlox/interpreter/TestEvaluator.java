@@ -66,6 +66,24 @@ public class TestEvaluator {
 
         binary = new Binary(new Literal(10), typeOnlyToken(TokenType.BANG_EQUAL), new Literal(10));
         assertEquals(false, evaluate(binary));
+
+        binary = new Binary(new Literal(10), typeOnlyToken(TokenType.GREATER), new Literal(0));
+        assertEquals(true, evaluate(binary));
+
+        binary = new Binary(new Literal(10), typeOnlyToken(TokenType.GREATER), new Literal(10));
+        assertEquals(false, evaluate(binary));
+
+        binary = new Binary(new Literal(10), typeOnlyToken(TokenType.GREATER_EQUAL), new Literal(10));
+        assertEquals(true, evaluate(binary));
+
+        binary = new Binary(new Literal(10), typeOnlyToken(TokenType.LESS), new Literal(0));
+        assertEquals(false, evaluate(binary));
+
+        binary = new Binary(new Literal(10), typeOnlyToken(TokenType.LESS_EQUAL), new Literal(10));
+        assertEquals(true, evaluate(binary));
+
+        binary = new Binary(new Literal(10), typeOnlyToken(TokenType.LESS), new Literal(100));
+        assertEquals(true, evaluate(binary));
     }
     @Test
     void TestTernary() {
