@@ -11,7 +11,7 @@ import java.util.function.Function;
 /**
  * Expression parser
  */
-public class ParseExpression implements IParser<Expression> {
+public class ParseExpression implements IParser<Expression, Token> {
 
     private final IErrorHandler errorHandler;
     private TokenSource tokens;

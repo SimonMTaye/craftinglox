@@ -7,6 +7,6 @@ import com.jlox.scanner.Token;
  * Each implementation is responsible for parsing a specific part of the language (i.e. Expression, Statement...)
  * @param <R> The return type of the parse statement
  */
-public interface IParser<R> {
-    R parse(Iterable<Token> tokens);
+public interface IParser<R, T> {
+    R parse(Iterable<T> t);
 }
