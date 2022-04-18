@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class TestEvaluator {
+public class TestExpressionEvaluator {
     @Test
     void TestUnary() {
         Unary unary = new Unary(new Token(TokenType.BANG, "!", null, 0), new Literal(true));
@@ -107,7 +107,7 @@ public class TestEvaluator {
     }
 
     Object evaluate(Expression expr) {
-        Evaluator e = new Evaluator();
+        ExpressionEvaluator e = new ExpressionEvaluator();
         return e.evaluate(expr);
     }
 

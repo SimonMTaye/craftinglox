@@ -4,7 +4,7 @@ import com.jlox.expression.*;
 import com.jlox.scanner.Token;
 import com.jlox.scanner.TokenType;
 
-public class Evaluator implements ExpressionVisitor<Object> {
+public class ExpressionEvaluator implements ExpressionVisitor<Object> {
 
     public Object evaluate(Expression expression) {
         return expression.accept(this);
