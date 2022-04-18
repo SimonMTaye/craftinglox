@@ -25,7 +25,7 @@ public class TestParser {
     void TestLiteralGrouping() {
         ArrayList<Token> tokens = new ArrayList<>();
         IErrorHandler handler = new CollectorHandler();
-        IParser<Expression, Token> parser = new ParseExpression(handler);
+        ParseExpression parser = new ParseExpression(handler);
         tokens.add(new Token(TokenType.LEFT_PAREN, "(", null, 1));
         tokens.add(new Token(TokenType.STRING, "\"Hello World\"", "Hello World", 10));
         // Test that unclosed grouping throws an exception
@@ -44,7 +44,7 @@ public class TestParser {
     void TestUnary() {
         ArrayList<Token> tokens = new ArrayList<>();
         IErrorHandler handler = new CollectorHandler();
-        IParser<Expression, Token> parser = new ParseExpression(handler);
+        ParseExpression parser = new ParseExpression(handler);
 
         tokens.add(new Token(TokenType.MINUS, "-", null, 1));
         tokens.add(new Token(TokenType.INTEGER, "10", null, 1));
@@ -59,7 +59,7 @@ public class TestParser {
     void TestTerm() {
         ArrayList<Token> tokens = new ArrayList<>();
         IErrorHandler handler = new CollectorHandler();
-        IParser<Expression, Token> parser = new ParseExpression(handler);
+        ParseExpression parser = new ParseExpression(handler);
 
         tokens.add(new Token(TokenType.INTEGER, "10", null, 1));
         tokens.add(new Token(TokenType.PLUS, "+", null, 1));
@@ -76,7 +76,7 @@ public class TestParser {
     void TestMultiple() {
         ArrayList<Token> tokens = new ArrayList<>();
         IErrorHandler handler = new CollectorHandler();
-        IParser<Expression, Token> parser = new ParseExpression(handler);
+        ParseExpression parser = new ParseExpression(handler);
         // 10 == (1 + 15 / 5)
         tokens.add(new Token(TokenType.INTEGER, "10", null, 1));
         tokens.add(new Token(TokenType.EQUAL_EQUAL, "==", null, 1));
@@ -109,7 +109,7 @@ public class TestParser {
     void TestTernary() {
         ArrayList<Token> tokens = new ArrayList<>();
         IErrorHandler handler = new CollectorHandler();
-        IParser<Expression, Token> parser = new ParseExpression(handler);
+        ParseExpression parser = new ParseExpression(handler);
         // Simple ternary expression
         tokens.add(new Token(TokenType.FALSE, "false", null, 1));
         tokens.add(new Token(TokenType.QUESTION_MARK, "?", null, 1));
@@ -129,7 +129,7 @@ public class TestParser {
     void TestNestedTernary() {
         ArrayList<Token> tokens = new ArrayList<>();
         IErrorHandler handler = new CollectorHandler();
-        IParser<Expression, Token> parser = new ParseExpression(handler);
+        ParseExpression parser = new ParseExpression(handler);
         // false ? (false ? (false ? 1 : 2) : 3) : (true ? 4 : 5)
         tokens.add(new Token(TokenType.FALSE, "false", null, 1));
         tokens.add(new Token(TokenType.QUESTION_MARK, "?", null, 1));
@@ -179,7 +179,7 @@ public class TestParser {
     void TestComma() {
         ArrayList<Token> tokens = new ArrayList<>();
         IErrorHandler handler = new CollectorHandler();
-        IParser<Expression, Token> parser = new ParseExpression(handler);
+        ParseExpression parser = new ParseExpression(handler);
         // 1,2
         tokens.add(new Token(TokenType.INTEGER, "1", null, 1));
         tokens.add(new Token(TokenType.COMMA, ",", null, 1));
@@ -195,7 +195,7 @@ public class TestParser {
     void TestComparison() {
         ArrayList<Token> tokens = new ArrayList<>();
         IErrorHandler handler = new CollectorHandler();
-        IParser<Expression, Token> parser = new ParseExpression(handler);
+        ParseExpression parser = new ParseExpression(handler);
 
         tokens.add(new Token(TokenType.INTEGER, "10", 10, 0));
         tokens.add(new Token(TokenType.GREATER, ">", 5, 0));

@@ -11,7 +11,7 @@ import java.util.function.Function;
 /**
  * Expression parser
  */
-public class ParseExpression implements IParser<Expression, Token> {
+public class ParseExpression extends AbstractParser<Expression> {
 
     private final IErrorHandler errorHandler;
     private TokenSource tokens;
@@ -133,24 +133,5 @@ public class ParseExpression implements IParser<Expression, Token> {
         return expr;
     }
 
-    /**
-     * Check if the next token matches one of the provided types
-     */
-    private boolean checkMultiple(TokenType... types) {
-        for (TokenType type : types) {
-            if (check(type))
-                return true;
-        }
-        return false;
-    }
 
-    /**
-     * Check if the next token matches the desired type
-     */
-    private boolean check(TokenType type) {
-        if (tokens.isAtEnd()) {
-            return false;
-        }
-        return tokens.peek().type == type;
-    }
 }
