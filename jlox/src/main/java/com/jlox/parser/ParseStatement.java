@@ -2,12 +2,16 @@ package com.jlox.parser;
 
 import com.jlox.error.ConsoleHandler;
 import com.jlox.error.IErrorHandler;
-import com.jlox.error.LoxError;
 import com.jlox.expression.Expression;
+import com.jlox.expression.Literal;
+import com.jlox.scanner.Token;
 import com.jlox.scanner.TokenType;
 import com.jlox.statement.ExprStatement;
 import com.jlox.statement.PrintStatement;
 import com.jlox.statement.Statement;
+import com.jlox.statement.VarDeclare;
+
+import static com.jlox.parser.ParseErrorCode.INVALID_INDENTIFIER;
 
 
 public class ParseStatement extends AbstractParser<Statement> {
@@ -41,7 +45,37 @@ public class ParseStatement extends AbstractParser<Statement> {
      */
     public Statement parse(TokenSource tokens) {
         this.tokens = tokens;
+        return declaration();
+    }
+
+    private Statement declaration() {
+        if (check(TokenType.VAR))
+            return varDeclaration();
         return statement();
+    }
+
+    private Statement varDeclaration() {
+        // Consume var token
+        tokens.advance();
+        ParseLoxError e = new ParseLoxError("Expected Identifier after var keyword", INVALID_INDENTIFIER, tokens.previous().offset);
+        Token name = checkAndAdvance(TokenType.IDENTIFIER, e);
+        VarDeclare variable;
+        // Initialize variable
+        if (check(TokenType.EQUAL)) {
+            // Consume the equal
+            tokens.advance();
+            Expression init = exprParser.parse(this.tokens);
+            variable = new VarDeclare(name, init);
+
+        } else {
+            // If there's no initializer, create  a null variable
+            variable = new VarDeclare(name, new Literal(TokenType.NIL));
+        }
+        e = new ParseLoxError("Expected semicolon after variable declaration", ParseErrorCode.MISSING_SEMICOLON, tokens.previous().offset);
+        // Check for semicolon
+        checkAndAdvance(TokenType.SEMICOLON, e);
+
+        return variable;
     }
 
     private Statement statement() {

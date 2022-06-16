@@ -91,18 +91,18 @@ public class TestParser {
         Expression result = parser.parse(tokens);
 
         assertInstanceOf(Binary.class, result, "Expect evaluated expression to be a binary");
-        assertInstanceOf(Grouping.class, ((Binary) result).right);
+        assertInstanceOf(Grouping.class, ((Binary) result).getRight());
 
-        Grouping grouping = (Grouping) ((Binary) result).right;
+        Grouping grouping = (Grouping) ((Binary) result).getRight();
 
         assertInstanceOf(Binary.class, grouping.expr);
 
         // This should contain 1 + (15 / 5)
         Binary binary = (Binary) grouping.expr;
-        assertInstanceOf(Literal.class, binary.left);
-        assertEquals(TokenType.PLUS, binary.operator.type);
-        assertInstanceOf(Binary.class, binary.right);
-        assertEquals(TokenType.SLASH, ((Binary) binary.right).operator.type);
+        assertInstanceOf(Literal.class, binary.getLeft());
+        assertEquals(TokenType.PLUS, binary.getOperator().type);
+        assertInstanceOf(Binary.class, binary.getRight());
+        assertEquals(TokenType.SLASH, ((Binary) binary.getRight()).getOperator().type);
     }
 
     @Test
@@ -188,7 +188,7 @@ public class TestParser {
         Expression result = parser.parse(tokens);
 
         assertInstanceOf(Binary.class, result, "Expect evaluated expression to be a binary");
-        assertEquals(TokenType.COMMA, ((Binary) result).operator.type);
+        assertEquals(TokenType.COMMA, ((Binary) result).getOperator().type);
     }
 
     @Test
@@ -203,7 +203,7 @@ public class TestParser {
 
         Expression result = parser.parse(tokens);
         assertInstanceOf(Binary.class, result);
-        assertEquals(TokenType.GREATER, ((Binary) result).operator.type);
+        assertEquals(TokenType.GREATER, ((Binary) result).getOperator().type);
 
 
     }

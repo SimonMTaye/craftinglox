@@ -1,5 +1,6 @@
 package com.jlox.expression;
 
+
 public class Literal extends Expression {
 	public final Object value;
 

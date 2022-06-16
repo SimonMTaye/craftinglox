@@ -14,4 +14,6 @@ public class PrintStatement extends Statement {
 	public <R> R accept(StatementVisitor<R> visitor) {
 		return visitor.visitPrintStatement(this);
 	}
+
+    public Expression getExpression() { return this.expr; }
 }

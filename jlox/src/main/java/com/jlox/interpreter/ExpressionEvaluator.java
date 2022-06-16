@@ -6,16 +6,32 @@ import com.jlox.scanner.TokenType;
 
 public class ExpressionEvaluator implements ExpressionVisitor<Object> {
 
+    private Environment scope;
+
+
+
+    public ExpressionEvaluator() {
+        this.scope = new Environment();
+    }
+
+    public ExpressionEvaluator(Environment env) {
+        this.scope = env;
+    }
+
+    public void setScope(Environment scope) {
+        this.scope = scope;
+    }
+
     public Object evaluate(Expression expression) {
         return expression.accept(this);
     }
     @Override
     public Object visitUnary(Unary unary) {
-        switch (unary.operator.type) {
+        switch (unary.getOperator().type) {
             case BANG:
-                return !isTruthy(unary.right.accept(this));
+                return !isTruthy(unary.getRight().accept(this));
             case MINUS: {
-                Object right = unary.right.accept(this);
+                Object right = unary.getRight().accept(this);
                 if (right instanceof Double) {
                     return -1 * (Double) right;
                 }
@@ -25,14 +41,20 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
                 throw new RuntimeError(RuntimeErrorType.TYPE_ERROR, "Expected a number.");
             }
         }
-        throw new RuntimeError(RuntimeErrorType.UNEXPECTED_OPERATOR, String.format("Unknown operator '%s'", unary.operator.lexme));
+        throw new RuntimeError(RuntimeErrorType.UNEXPECTED_OPERATOR, String.format("Unknown operator '%s'", unary.getOperator().lexme));
+    }
+
+    @Override
+    public Object visitVariable(Variable variable) {
+        Expression expr = scope.getValue(variable);
+        return expr.accept(this);
     }
 
     @Override
     public Object visitBinary(Binary binary) {
-        Object left = binary.left.accept(this);
-        Object right = binary.right.accept(this);
-        switch (binary.operator.type) {
+        Object left = binary.getLeft().accept(this);
+        Object right = binary.getRight().accept(this);
+        switch (binary.getOperator().type) {
             case COMMA:
                 return right;
             case EQUAL_EQUAL:
@@ -46,14 +68,14 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
             case GREATER_EQUAL:
             case LESS_EQUAL:
             case LESS:
-                return operate(left, right, binary.operator);
+                return operate(left, right, binary.getOperator());
             case PLUS: {
                 if (left instanceof String || right instanceof String)
                     return left.toString() + right.toString();
-                return operate(left, right, binary.operator);
+                return operate(left, right, binary.getOperator());
             }
         }
-        throw new RuntimeError(RuntimeErrorType.TYPE_ERROR, String.format("%s is not supported for %s and %s", binary.operator.lexme, left.getClass(), right.getClass()));
+        throw new RuntimeError(RuntimeErrorType.TYPE_ERROR, String.format("%s is not supported for %s and %s", binary.getOperator().lexme, left.getClass(), right.getClass()));
     }
 
     @Override

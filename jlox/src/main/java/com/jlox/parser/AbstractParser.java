@@ -1,6 +1,8 @@
 package com.jlox.parser;
 
+import com.jlox.Lox;
 import com.jlox.error.IErrorHandler;
+import com.jlox.error.LoxError;
 import com.jlox.scanner.Token;
 import com.jlox.scanner.TokenType;
 import com.jlox.statement.Statement;
@@ -38,6 +40,43 @@ public abstract class AbstractParser<R> {
             return false;
         }
         return tokens.peek().type == type;
+    }
+
+    /**
+     * Check if the next token is off the expected type and return it if it is or throw the given error if not
+     * @param type  The desired type
+     * @param e     The error to throw if the next token is of a different type
+     * @return      The token whose token matches the desired type
+     */
+    protected Token checkAndAdvance(TokenType type, LoxError e) {
+        if (check(type)) {
+            return tokens.advance();
+        }
+        throw e;
+    }
+
+    /**
+     * When there is an error parsing, advance the token stream until the next "clean slate"
+     * like the declaration of a variable, class, etc.
+     */
+    protected void synchronize() {
+        while (!tokens.isAtEnd()) {
+            if (tokens.previous().type == TokenType.SEMICOLON) return;
+
+            switch (tokens.peek().type) {
+                case CLASS:
+                case FUN:
+                case VAR:
+                case FOR:
+                case IF:
+                case WHILE:
+                case PRINT:
+                case RETURN:
+                    return;
+            }
+
+            tokens.advance();
+        }
     }
 
 }

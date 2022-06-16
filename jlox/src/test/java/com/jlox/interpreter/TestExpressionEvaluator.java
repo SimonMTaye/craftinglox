@@ -106,13 +106,25 @@ public class TestExpressionEvaluator {
         assertThrows(RuntimeError.class, () -> evaluate(invalid));
     }
 
+    @Test
+    void TestVariables() {
+        Environment scope = new Environment();
+        Variable test1 = new Variable(getIdentifier("test1"));
+        scope.defineVarible(test1, new Literal(true));
+        ExpressionEvaluator e = new ExpressionEvaluator(scope);
+        assertEquals(true, e.evaluate(test1));
+    }
+
     Object evaluate(Expression expr) {
         ExpressionEvaluator e = new ExpressionEvaluator();
         return e.evaluate(expr);
     }
 
-    Token typeOnlyToken(TokenType type) {
+    private Token typeOnlyToken(TokenType type) {
         return new Token(type, "", null, 0);
     }
 
+    private Token getIdentifier(String name) {
+        return new Token(TokenType.IDENTIFIER, name, name, 0);
+    }
 }

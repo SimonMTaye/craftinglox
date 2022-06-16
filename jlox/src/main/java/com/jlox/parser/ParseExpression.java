@@ -101,11 +101,15 @@ public class ParseExpression extends AbstractParser<Expression> {
         }
         return primary();
     }
-    // primary -> NUMBER | STRING | 'true | 'false' | 'nil' | '(' expression ')'
+    // primary -> NUMBER | STRING | 'true | 'false' | 'nil' | IDENTIFIER |  '(' expression ')'
     private Expression primary() {
         if (checkMultiple(TokenType.INTEGER, TokenType.DOUBLE, TokenType.STRING, TokenType.TRUE, TokenType.FALSE, TokenType.NIL)) {
             Token token = tokens.advance();
             return new Literal(token);
+        }
+        if (check(TokenType.IDENTIFIER)) {
+            Token token = tokens.advance();
+            return new Variable(token);
         }
         if (check(TokenType.LEFT_PAREN)) {
             tokens.advance();
