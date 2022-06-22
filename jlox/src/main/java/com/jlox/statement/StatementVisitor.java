@@ -2,7 +2,7 @@ package com.jlox.statement;
 
 
 public interface StatementVisitor<R> {
-	R visitPrintStatement(PrintStatement printstatement);
-	R visitExprStatement(ExprStatement exprstatement);
-	R visitVarDeclare(VarDeclare varAssign);
+	public R visitPrintStatement(PrintStatement printstatement);
+	public R visitExprStatement(ExprStatement exprstatement);
+	public R visitVarDeclare(VarDeclare vardeclare);
 }

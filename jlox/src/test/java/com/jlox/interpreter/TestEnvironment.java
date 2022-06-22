@@ -30,7 +30,7 @@ public class TestEnvironment {
         // Check that a value is assigned correctly
         Environment globalEnv = new Environment();
         Variable test1 = new Variable(getIdentifier("test1"));
-        globalEnv.defineVarible(test1, new Literal("Hello World"));
+        globalEnv.defineVariable(test1, new Literal("Hello World"));
         assertEquals("Hello World", evalExpression(globalEnv.getValue(test1)));
     }
 
@@ -39,7 +39,7 @@ public class TestEnvironment {
         // Check that a value is assigned correctly
         Environment globalEnv = new Environment();
         Variable test1 = new Variable(getIdentifier("test1"));
-        globalEnv.defineVarible(test1, new Literal("Hello World"));
+        globalEnv.defineVariable(test1, new Literal("Hello World"));
         globalEnv.changeValue(test1, new Literal(true));
         assertEquals(true, evalExpression(globalEnv.getValue(test1)));
     }
@@ -49,13 +49,13 @@ public class TestEnvironment {
         // Check that a value is assigned correctly
         Environment globalEnv = new Environment();
         Variable test1 = new Variable(getIdentifier("test1"));
-        globalEnv.defineVarible(test1, new Literal("Hello World"));
+        globalEnv.defineVariable(test1, new Literal("Hello World"));
         Environment scopedEnv = new Environment(globalEnv);
         // Test that scopedEnv can read from its parent
         assertEquals("Hello World", evalExpression(scopedEnv.getValue(test1)));
 
         // Test that scopedEnv variable can be redefined
-        scopedEnv.defineVarible(test1, new Literal("Blue"));
+        scopedEnv.defineVariable(test1, new Literal("Blue"));
         assertEquals("Blue", evalExpression(scopedEnv.getValue(test1)));
 
         scopedEnv.changeValue(test1, new Literal("Simon"));
@@ -64,7 +64,7 @@ public class TestEnvironment {
         assertEquals("Hello World", evalExpression(globalEnv.getValue(test1)));
 
         Variable test2 = new Variable(getIdentifier("test2"));
-        scopedEnv.defineVarible(test2, new Literal(true));
+        scopedEnv.defineVariable(test2, new Literal(true));
         assertEquals(true, evalExpression(scopedEnv.getValue(test2)));
 
         // Test that varibles defined in scopedEnv aren't available in the parent
@@ -92,10 +92,10 @@ public class TestEnvironment {
             () -> globalEnv.changeValue(test1, new Literal("Hello World"))
         );
 
-        globalEnv.defineVarible(test1, new Literal("Hello World"));
+        globalEnv.defineVariable(test1, new Literal("Hello World"));
         assertThrows(
             ParseLoxError.class,
-            () -> globalEnv.defineVarible(test1, new Literal("Simon"))
+            () -> globalEnv.defineVariable(test1, new Literal("Simon"))
         );
     }
     /**
@@ -116,10 +116,10 @@ public class TestEnvironment {
             () -> scopedEnv.getValue(test1)
         );
 
-        scopedEnv.defineVarible(test1, new Literal("Hello World"));
+        scopedEnv.defineVariable(test1, new Literal("Hello World"));
         assertThrows(
             ParseLoxError.class,
-            () -> scopedEnv.defineVarible(test1, new Literal("Simon"))
+            () -> scopedEnv.defineVariable(test1, new Literal("Simon"))
         );
     }
 

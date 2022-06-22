@@ -1,4 +1,6 @@
-package com.jlox.expression;
+package com.jlox.interpreter;
+
+import com.jlox.expression.*;
 
 public class AstPrinter implements ExpressionVisitor<String> {
 
@@ -8,7 +10,7 @@ public class AstPrinter implements ExpressionVisitor<String> {
 
     @Override
     public String visitBinary(Binary binary) {
-        return String.format("(%s %s %s)", binary.getOperator().lexme, binary.getLeft().accept(this), binary.getRight().accept(this));
+        return String.format("(%s %s %s)", binary.operator.lexme, binary.left.accept(this), binary.right.accept(this));
     }
 
     @Override
@@ -33,11 +35,11 @@ public class AstPrinter implements ExpressionVisitor<String> {
 
     @Override
     public String visitUnary(Unary unary) {
-        return String.format("(%s %s)", unary.getOperator().lexme, unary.getRight().accept(this));
+        return String.format("(%s %s)", unary.operator.lexme, unary.right.accept(this));
     }
 
     @Override
     public String visitVariable(Variable variable) {
-        return String.format("$(%s)", variable.getName());
+        return String.format("$(%s)", variable.name.lexme);
     }
 }

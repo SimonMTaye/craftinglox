@@ -31,19 +31,20 @@ public class Environment {
      * @return the value stored for the variable
      */
     public Expression getValue(Variable variable) {
-        return getValue(variable.getName(), variable.getOffset());
+        return getValue(getName(variable), getOffset(variable));
     }
 
     /**
-     * Set the value of a variable. If the variable has already
+     * Set the value of a variable. If the variable has already been declared, this will throw an error
      * @param variable the variable to define
      * @param value the value of the variable
      */
-    public void defineVarible(Variable variable, Expression value) {
-        if (mappings.containsKey(variable.getName())) {
-            throw new ParseLoxError(variable.getName() + " has already been declared",ParseErrorCode.EXISTING_VARIABLE, variable.getOffset());
+    public void defineVariable(Variable variable, Expression value) {
+        String name = getName(variable);
+        if (mappings.containsKey(name)) {
+            throw new ParseLoxError(name + " has already been declared",ParseErrorCode.EXISTING_VARIABLE, getOffset(variable));
         }
-        mappings.put(variable.getName(), value);
+        mappings.put(name, value);
     }
 
     /**
@@ -52,18 +53,26 @@ public class Environment {
      * @param value the new value
      */
     public void changeValue(Variable variable, Expression value) {
-        if (!mappings.containsKey(variable.getName())) {
+        if (!mappings.containsKey(getName(variable))) {
             if (parent == null)
-                throw new ParseLoxError(variable.getName() + " has not been declared",ParseErrorCode.UNDEFINED_VALUE, variable.getOffset());
+                throw new ParseLoxError(getName(variable) + " has not been declared",ParseErrorCode.UNDEFINED_VALUE, getOffset(variable));
             parent.changeValue(variable, value);
         }
-        mappings.put(variable.getName(), value);
+        mappings.put(getName(variable), value);
     }
 
     private Expression getValue(String key, int offset) {
         if (this.mappings.containsKey(key)) return mappings.get(key);
         if (this.parent != null) return parent.getValue(key, offset);
         throw new ParseLoxError(key + " is an undefined variable", ParseErrorCode.UNDEFINED_VALUE, offset);
+    }
+
+    private String getName(Variable var) {
+        return var.name.lexme;
+    }
+
+    private int getOffset(Variable var) {
+        return var.name.offset;
     }
 
 }

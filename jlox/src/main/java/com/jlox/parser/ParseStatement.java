@@ -16,7 +16,6 @@ import static com.jlox.parser.ParseErrorCode.INVALID_INDENTIFIER;
 
 public class ParseStatement extends AbstractParser<Statement> {
 
-    private TokenSource tokens;
     private final IErrorHandler handler;
     private final ParseExpression exprParser;
 

@@ -48,19 +48,19 @@ public class StatementEvaluator implements StatementVisitor<Void> {
 
     @Override
     public Void visitPrintStatement(PrintStatement printstatement) {
-        System.out.println(exprEval.evaluate(printstatement.getExpression()));
+        System.out.println(exprEval.evaluate(printstatement.expr));
         return null;
     }
 
     @Override
     public Void visitExprStatement(ExprStatement exprstatement) {
-        exprEval.evaluate(exprstatement.getExpression());
+        exprEval.evaluate(exprstatement.expr);
         return null;
     }
 
     @Override
     public Void visitVarDeclare(VarDeclare varDeclare) {
-        scope.defineVarible(new Variable(varDeclare.getName()), varDeclare.getInit());
+        scope.defineVariable(new Variable(varDeclare.name), varDeclare.init);
         return null;
     }
 

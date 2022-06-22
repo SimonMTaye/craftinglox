@@ -14,7 +14,6 @@ import java.util.function.Function;
 public class ParseExpression extends AbstractParser<Expression> {
 
     private final IErrorHandler errorHandler;
-    private TokenSource tokens;
 
     public ParseExpression(IErrorHandler errorHandler) {
         this.errorHandler = errorHandler;
