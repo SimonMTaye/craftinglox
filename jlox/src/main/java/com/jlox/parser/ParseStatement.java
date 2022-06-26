@@ -10,6 +10,7 @@ import com.jlox.scanner.TokenType;
 import com.jlox.statement.*;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static com.jlox.parser.ParseErrorCode.INVALID_INDENTIFIER;
 
@@ -37,8 +38,8 @@ public class ParseStatement extends AbstractParser<Statement> {
     }
 
     /**
-     * Parse tokens continously until token stream is empty
-     * @param tokens token iteralble
+     * Parse tokens continuously until token stream is empty
+     * @param tokens token iterable
      * @return List of statements
      */
     public ArrayList<Statement> parseAll(Iterable<Token> tokens) {
@@ -47,7 +48,7 @@ public class ParseStatement extends AbstractParser<Statement> {
     }
 
     /**
-     * Parse tokens continously until token stream is empty
+     * Parse tokens continuously until token stream is empty
      * @param tokens token source
      * @return List of statements
      */
@@ -81,6 +82,19 @@ public class ParseStatement extends AbstractParser<Statement> {
     }
 
     private Statement parse() {
+        return block();
+    }
+
+    private Statement block() {
+        if (check(TokenType.LEFT_BRACE)) {
+            List<Statement> stmts = new ArrayList<>();
+            while (!check(TokenType.RIGHT_PAREN) && !tokens.isAtEnd()) {
+                stmts.add(parse());
+            }
+            ParseLoxError err = new ParseLoxError("Expected closing '}'", ParseErrorCode.UNCLOSED_BRACE, tokens.previous().offset);
+            checkAndAdvance(TokenType.RIGHT_PAREN, err);
+            return new Block(stmts);
+        }
         return declaration();
     }
 

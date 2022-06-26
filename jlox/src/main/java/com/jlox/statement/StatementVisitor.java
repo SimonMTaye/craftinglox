@@ -6,4 +6,5 @@ public interface StatementVisitor<R> {
 	public R visitExprStatement(ExprStatement exprstatement);
 	public R visitVarDeclare(VarDeclare vardeclare);
 	public R visitVarAssign(VarAssign varassign);
+	public R visitBlock(Block block);
 }
