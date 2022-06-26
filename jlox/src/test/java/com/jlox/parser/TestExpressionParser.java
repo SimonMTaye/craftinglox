@@ -10,14 +10,13 @@ import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class TestParser {
+public class TestExpressionParser {
     @Test
     void TestLiteral() {
         ArrayList<Token> tokens = new ArrayList<>();
         tokens.add(new Token(TokenType.STRING, "\"Hello World\"", "Hello World", 10));
         ParseExpression parser = new ParseExpression();
         Expression result = parser.parse(tokens);
-        //TODO Use evaluate visitor to implement tests
         assertInstanceOf(Literal.class, result, "Expect evaluated expression to be a literal");
     }
 

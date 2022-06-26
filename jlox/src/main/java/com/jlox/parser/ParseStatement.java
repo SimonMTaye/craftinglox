@@ -4,12 +4,12 @@ import com.jlox.error.ConsoleHandler;
 import com.jlox.error.IErrorHandler;
 import com.jlox.expression.Expression;
 import com.jlox.expression.Literal;
+import com.jlox.expression.Variable;
 import com.jlox.scanner.Token;
 import com.jlox.scanner.TokenType;
-import com.jlox.statement.ExprStatement;
-import com.jlox.statement.PrintStatement;
-import com.jlox.statement.Statement;
-import com.jlox.statement.VarDeclare;
+import com.jlox.statement.*;
+
+import java.util.ArrayList;
 
 import static com.jlox.parser.ParseErrorCode.INVALID_INDENTIFIER;
 
@@ -36,7 +36,40 @@ public class ParseStatement extends AbstractParser<Statement> {
         this.exprParser = new ParseExpression(this.handler);
     }
 
+    /**
+     * Parse tokens continously until token stream is empty
+     * @param tokens token iteralble
+     * @return List of statements
+     */
+    public ArrayList<Statement> parseAll(Iterable<Token> tokens) {
+        TokenSource tokensSource = new TokenSource(tokens);
+        return parseAll(tokensSource);
+    }
 
+    /**
+     * Parse tokens continously until token stream is empty
+     * @param tokens token source
+     * @return List of statements
+     */
+    public ArrayList<Statement> parseAll(TokenSource tokens) {
+        this.tokens = tokens;
+        ArrayList<Statement> stmts = new ArrayList<>();
+        while (!this.tokens.isAtEnd()) {
+            stmts.add(parse());
+        }
+        return stmts;
+    }
+
+
+    /**
+     * Parse an iterable stream of tokens
+     * @param tokenIterable iterable tokens
+     * @return Statement
+     */
+    public Statement parse(Iterable<Token> tokenIterable) {
+        TokenSource tokens = new TokenSource(tokenIterable);
+        return parse(tokens);
+    }
     /**
      * Parse a list of tokens as a single statement
      * @param tokens tokens to be parsed
@@ -44,6 +77,10 @@ public class ParseStatement extends AbstractParser<Statement> {
      */
     public Statement parse(TokenSource tokens) {
         this.tokens = tokens;
+        return parse();
+    }
+
+    private Statement parse() {
         return declaration();
     }
 
@@ -95,12 +132,33 @@ public class ParseStatement extends AbstractParser<Statement> {
 
     }
 
-
     private Statement expressionStatement() {
         Expression value = exprParser.parse(this.tokens);
-        if (!check(TokenType.SEMICOLON)) {
-            throw new ParseLoxError("Expected ';' after value", ParseErrorCode.MISSING_SEMICOLON,tokens.previous().offset);
+        Token next = tokens.peek();
+        switch (next.type) {
+            case SEMICOLON:
+                tokens.advance();
+                return new ExprStatement(value);
+            case EQUAL:
+                tokens.advance();
+                return assignStatement(value);
+            default:
+                throw new ParseLoxError("Expected ';' after value", ParseErrorCode.MISSING_SEMICOLON, tokens.previous().offset);
         }
-        return new ExprStatement(value);
     }
+
+    private Statement assignStatement(Expression lvalue) {
+        if (lvalue instanceof Variable) {
+            Variable var = (Variable) lvalue;
+            Expression rvalue = exprParser.parse(this.tokens);
+            ParseLoxError err =  new ParseLoxError("Expected ';' after value", ParseErrorCode.MISSING_SEMICOLON, tokens.previous().offset);
+            checkAndAdvance(TokenType.SEMICOLON, err);
+            return new VarAssign(var.name, rvalue);
+
+        }
+        throw new ParseLoxError("Cannot assign value to " + lvalue.toString(), ParseErrorCode.INVALID_LVALUE, tokens.previous().offset);
+
+    }
+
+
 }

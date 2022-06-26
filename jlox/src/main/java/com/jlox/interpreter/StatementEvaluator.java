@@ -64,4 +64,11 @@ public class StatementEvaluator implements StatementVisitor<Void> {
         return null;
     }
 
+    @Override
+    public Void visitVarAssign(VarAssign varAssign) {
+        scope.changeValue(new Variable(varAssign.name), varAssign.newVal);
+        return null;
+    }
+
+
 }
