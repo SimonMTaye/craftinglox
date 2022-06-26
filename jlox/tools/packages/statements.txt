@@ -1,0 +1,9 @@
+Statement
+$package com.jlox.statement;
+*import com.jlox.expression.Expression;
+*import com.jlox.scanner.Token;
+!src\main\java\com\jlox\statement
+PrintStatement Expression expr
+ExprStatement Expression expr
+VarDeclare Token name Expression init
+VarAssign Token name Expression newVal
