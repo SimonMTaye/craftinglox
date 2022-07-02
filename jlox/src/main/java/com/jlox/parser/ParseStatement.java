@@ -9,6 +9,7 @@ import com.jlox.scanner.Token;
 import com.jlox.scanner.TokenType;
 import com.jlox.statement.*;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -129,11 +130,19 @@ public class ParseStatement extends AbstractParser<Statement> {
     }
 
     private Statement statement() {
-        if (check(TokenType.PRINT)) {
-            tokens.advance();
-            return printStatement();
+        Token next = tokens.advance();
+        switch (next.type) {
+            case PRINT:
+                return printStatement();
+            case IF:
+                return ifStatement();
+            case WHILE:
+                return whileStatement();
+            case FOR:
+                return forStatement();
+            default:
+                return expressionStatement();
         }
-        return expressionStatement();
     }
 
 
@@ -145,6 +154,83 @@ public class ParseStatement extends AbstractParser<Statement> {
         return new PrintStatement(value);
 
     }
+
+    // Grammar IF Expression (Block | '\n'Statement) (ELSE Statement)?
+    private Statement ifStatement() {
+        Expression condition = exprParser.parse(this.tokens);
+        Statement ifBranch = controlFlowStatement();
+
+        Statement elseBranch = null;
+        if (check(TokenType.ELSE)) {
+            tokens.advance();
+            elseBranch = statement();
+        }
+        return new IfStatement(condition, ifBranch, elseBranch);
+
+    }
+
+    // Grammar WHILE Expression (Block | '\n'Statement)
+    private Statement whileStatement() {
+        Expression condition = exprParser.parse(this.tokens);
+        return new WhileStatement(condition, controlFlowStatement());
+    }
+
+
+    // Grammar FOR (Expression)?; (Expression)? ; (Expression)? (Block | '\n'Statement)
+    private Statement forStatement() {
+        Statement init = forGetStatement();
+
+        Expression condition = null;
+        if (!check(TokenType.SEMICOLON)) {
+            condition = exprParser.parse(this.tokens);
+            if (!check(TokenType.SEMICOLON)) {
+                throw new ParseLoxError("Expected ';' after condition", ParseErrorCode.MISSING_SEMICOLON, tokens.previous().offset);
+            }
+        }
+        // Consume the semicolon
+        tokens.advance();
+
+        Statement post = forGetStatement();
+        Statement body = controlFlowStatement();
+
+        // Transform into a while loop
+        ArrayList<Statement> whileBody = new ArrayList<>();
+        whileBody.add(body);
+        whileBody.add(post);
+
+        WhileStatement whileStmt  = new WhileStatement(condition, new Block(whileBody));
+        ArrayList<Statement> forStmts = new ArrayList<>();
+        forStmts.add(init);
+        forStmts.add(whileStmt);
+        return new Block(forStmts);
+    }
+
+    // (Block | '\n'Statement)
+    private Statement controlFlowStatement() {
+        // Check if the next character is a left brace or new line. If so, proceed
+        if (!(check(TokenType.LEFT_BRACE) || check(TokenType.NEW_LINE))) {
+            throw new ParseLoxError("Expected '{' or new line after while condition", ParseErrorCode.MISSING_LEFT_BRACE_OR_NL, tokens.previous().offset);
+        }
+
+        // Consume the new line if it exists
+        if (check(TokenType.NEW_LINE))
+            tokens.advance();
+
+        return statement();
+    }
+
+    /**
+     * Helper function for parsing for statement syntax. Parses (statement | ';')
+     * @return statement or null
+     */
+    private Statement forGetStatement() {
+        Statement stmt = null;
+        if (!check(TokenType.SEMICOLON)) {
+            stmt = statement();
+        }
+        return stmt;
+    }
+
 
     private Statement expressionStatement() {
         Expression value = exprParser.parse(this.tokens);
@@ -173,6 +259,4 @@ public class ParseStatement extends AbstractParser<Statement> {
         throw new ParseLoxError("Cannot assign value to " + lvalue.toString(), ParseErrorCode.INVALID_LVALUE, tokens.previous().offset);
 
     }
-
-
 }

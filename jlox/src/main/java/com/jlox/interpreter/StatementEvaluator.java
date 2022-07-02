@@ -70,5 +70,33 @@ public class StatementEvaluator implements StatementVisitor<Void> {
         return null;
     }
 
+    @Override
+    public Void visitBlock(Block block) {
+        nestScope();
+        for (Statement stmt : block.stmts) {
+            execute(stmt);
+        }
+        unnestScope();
+        return null;
+    }
+
+    @Override
+    public Void visitIfStatement(IfStatement ifstatement) {
+        if (exprEval.evaluate(ifstatement.condition).equals(true)) {
+            execute(ifstatement.thenBranch);
+        } else if (ifstatement.elseBranch != null) {
+            execute(ifstatement.elseBranch);
+        }
+        return null;
+    }
+
+    @Override
+    public Void visitWhileStatement(WhileStatement whilestatement) {
+        while (exprEval.evaluate(whilestatement.condition).equals(true)) {
+            execute(whilestatement.body);
+        }
+        return null;
+    }
+
 
 }

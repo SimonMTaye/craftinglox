@@ -7,4 +7,6 @@ public interface StatementVisitor<R> {
 	public R visitVarDeclare(VarDeclare vardeclare);
 	public R visitVarAssign(VarAssign varassign);
 	public R visitBlock(Block block);
+	public R visitIfStatement(IfStatement ifstatement);
+	public R visitWhileStatement(WhileStatement whilestatement);
 }

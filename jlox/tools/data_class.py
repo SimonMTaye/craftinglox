@@ -69,7 +69,6 @@ class DerivedClass:
         class_str += f"\n\npublic class {self.name} extends {self.base} "
         class_str += "{\n"
         # Add the fields to the class
-        # TODO Add getters for fields
         for key in self.fields.keys():
             class_str += get_field_str(key, self.fields[key])
         class_str = DerivedClass.add_line(class_str, self.constructor())
