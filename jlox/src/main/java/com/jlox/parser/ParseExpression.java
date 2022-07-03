@@ -62,7 +62,7 @@ public class ParseExpression extends AbstractParser<Expression> {
     }
     // ternary -> equality ? ternary : ternary | equality
     private Expression ternary() {
-        Expression expr = logical();
+        Expression expr = logicalOr();
         if (check(TokenType.QUESTION_MARK)) {
             tokens.advance();
             Expression left = ternary();
@@ -75,11 +75,20 @@ public class ParseExpression extends AbstractParser<Expression> {
         }
         return expr;
     }
-
-    // logical -> equality ( ('and' | 'or') equality) *
-    private Expression logical() {
+    // logicalOr -> logicalAnd ('or' logicalAnd) *
+    private Expression logicalOr() {
+        Expression left = logicalAnd();
+        if (check(TokenType.OR)) {
+            Token op = tokens.advance();
+            Expression right = logicalAnd();
+            return new Logical(left, op, right);
+        }
+        return left;
+    }
+    // logicalAnd -> equality ('and' equality) *
+    private Expression logicalAnd() {
         Expression left = equality();
-        if (check(TokenType.OR) || check(TokenType.AND)) {
+        if (check(TokenType.AND)) {
             Token op = tokens.advance();
             Expression right = equality();
             return new Logical(left, op, right);
