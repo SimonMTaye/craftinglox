@@ -78,6 +78,19 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
         throw new RuntimeError(RuntimeErrorType.TYPE_ERROR, String.format("%s is not supported for %s and %s", binary.operator.lexme, left.getClass(), right.getClass()));
     }
 
+    // Logical operator with short-circuiting
+    @Override
+    public Object visitLogical(Logical logical) {
+        Object left = logical.left.accept(this);
+        boolean truthy = isTruthy(left);
+        if (logical.operator.type == TokenType.OR) {
+            if (truthy) return left;
+        } else if (logical.operator.type == TokenType.AND) {
+            if (!truthy) return left;
+        }
+        return logical.right.accept(this);
+    }
+
     @Override
     public Object visitTernary(Ternary ternary) {
         if (isTruthy(ternary.condition.accept(this))) {

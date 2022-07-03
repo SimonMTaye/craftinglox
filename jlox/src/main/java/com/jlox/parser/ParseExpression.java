@@ -62,7 +62,7 @@ public class ParseExpression extends AbstractParser<Expression> {
     }
     // ternary -> equality ? ternary : ternary | equality
     private Expression ternary() {
-        Expression expr = equality();
+        Expression expr = logical();
         if (check(TokenType.QUESTION_MARK)) {
             tokens.advance();
             Expression left = ternary();
@@ -74,6 +74,17 @@ public class ParseExpression extends AbstractParser<Expression> {
             throw  new ParseLoxError("Expected ':' to match '?'", ParseErrorCode.MISSING_COLON, tokens.previous().offset);
         }
         return expr;
+    }
+
+    // logical -> equality ( ('and' | 'or') equality) *
+    private Expression logical() {
+        Expression left = equality();
+        if (check(TokenType.OR) || check(TokenType.AND)) {
+            Token op = tokens.advance();
+            Expression right = equality();
+            return new Logical(left, op, right);
+        }
+        return left;
     }
     // equality -> comparison ( ('!=' | '==') comparison) *
     private Expression equality() {
