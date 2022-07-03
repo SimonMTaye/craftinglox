@@ -75,34 +75,35 @@ public class StatementEvaluator implements StatementVisitor<Void> {
     @Override
     public Void visitBlock(Block block) {
         nestScope();
-        for (Statement stmt : block.stmts) {
-            execute(stmt);
+        try {
+            for (Statement stmt : block.stmts) {
+                execute(stmt);
+            }
+        } finally {
+            unnestScope();
         }
-        unnestScope();
         return null;
     }
 
     @Override
     public Void visitIfStatement(IfStatement ifstatement) {
-        if (exprEval.evaluate(ifstatement.condition).equals(true)) {
-            execute(ifstatement.thenBranch);
-        } else if (ifstatement.elseBranch != null) {
-            execute(ifstatement.elseBranch);
+        try {
+            if (exprEval.evaluate(ifstatement.condition).equals(true)) {
+                execute(ifstatement.thenBranch);
+            } else if (ifstatement.elseBranch != null) {
+                execute(ifstatement.elseBranch);
+            }
+        } catch (BreakException ignored) {
         }
         return null;
     }
 
     @Override
     public Void visitWhileStatement(WhileStatement whilestatement) {
-        int curLevel = nestingLevel;
         while (whilestatement.condition == null || exprEval.evaluate(whilestatement.condition).equals(true)) {
             try {
                 execute(whilestatement.body);
-            } catch (BreakException e) {
-                if (curLevel < nestingLevel) {
-                    unnestScope();
-                }
-                return null;
+            } catch (BreakException ignored) {
             }
         }
         return null;
