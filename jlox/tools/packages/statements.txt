@@ -11,3 +11,4 @@ VarAssign Token name Expression newVal
 Block List<Statement> stmts
 IfStatement Expression condition Statement thenBranch Statement elseBranch
 WhileStatement Expression condition Statement body
+BreakStatement

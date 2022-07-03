@@ -140,9 +140,21 @@ public class ParseStatement extends AbstractParser<Statement> {
                 return whileStatement();
             case FOR:
                 return forStatement();
+            case BREAK:
+                throw new ParseLoxError("break statements may only appear within a for or while loop", ParseErrorCode.INVALID_BREAK, next.offset);
             default:
                 return expressionStatement();
         }
+    }
+
+    private Statement breakStatement() {
+        if (check(TokenType.BREAK)) {
+            tokens.advance();
+            ParseLoxError e = new ParseLoxError("Expected semicolon after break statement", ParseErrorCode.MISSING_SEMICOLON, tokens.previous().offset);
+            checkAndAdvance(TokenType.SEMICOLON, e);
+            return new BreakStatement();
+        }
+        return statement();
     }
 
 
@@ -216,7 +228,7 @@ public class ParseStatement extends AbstractParser<Statement> {
         if (check(TokenType.NEW_LINE))
             tokens.advance();
 
-        return statement();
+        return breakStatement();
     }
 
     /**

@@ -9,4 +9,5 @@ public interface StatementVisitor<R> {
 	public R visitBlock(Block block);
 	public R visitIfStatement(IfStatement ifstatement);
 	public R visitWhileStatement(WhileStatement whilestatement);
+	public R visitBreakStatement(BreakStatement breakstatement);
 }

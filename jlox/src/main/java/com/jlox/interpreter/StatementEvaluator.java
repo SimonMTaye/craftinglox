@@ -8,6 +8,7 @@ public class StatementEvaluator implements StatementVisitor<Void> {
 
     private Environment scope;
     private final ExpressionEvaluator exprEval;
+    private int nestingLevel = 0;
 
 
 
@@ -28,6 +29,7 @@ public class StatementEvaluator implements StatementVisitor<Void> {
      */
     private void nestScope() {
         scope = new Environment(scope);
+        nestingLevel++;
     }
 
     /**
@@ -35,7 +37,7 @@ public class StatementEvaluator implements StatementVisitor<Void> {
      */
     private void unnestScope() {
         scope = scope.getHigherScope();
-
+        nestingLevel--;
     }
 
 
@@ -92,10 +94,23 @@ public class StatementEvaluator implements StatementVisitor<Void> {
 
     @Override
     public Void visitWhileStatement(WhileStatement whilestatement) {
+        int curLevel = nestingLevel;
         while (whilestatement.condition == null || exprEval.evaluate(whilestatement.condition).equals(true)) {
-            execute(whilestatement.body);
+            try {
+                execute(whilestatement.body);
+            } catch (BreakException e) {
+                if (curLevel < nestingLevel) {
+                    unnestScope();
+                }
+                return null;
+            }
         }
         return null;
+    }
+
+    @Override
+    public Void visitBreakStatement(BreakStatement breakstatement) {
+        throw new BreakException();
     }
 
 

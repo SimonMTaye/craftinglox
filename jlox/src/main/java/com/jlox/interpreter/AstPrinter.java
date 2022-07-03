@@ -14,6 +14,11 @@ public class AstPrinter implements ExpressionVisitor<String> {
     }
 
     @Override
+    public String visitLogical(Logical logical) {
+        return String.format("(%s %s %s)", logical.operator.lexme, logical.left.accept(this), logical.right.accept(this));
+    }
+
+    @Override
     public String visitTernary(Ternary ternary) {
         return String.format("(if %s %s else %s)",
             ternary.condition.accept(this),
