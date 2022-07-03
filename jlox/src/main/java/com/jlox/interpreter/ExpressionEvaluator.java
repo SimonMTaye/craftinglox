@@ -81,14 +81,14 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
     // Logical operator with short-circuiting
     @Override
     public Object visitLogical(Logical logical) {
-        Object left = logical.left.accept(this);
+        Object left = evaluate(logical.left);
         boolean truthy = isTruthy(left);
         if (logical.operator.type == TokenType.OR) {
             if (truthy) return left;
         } else if (logical.operator.type == TokenType.AND) {
             if (!truthy) return left;
         }
-        return logical.right.accept(this);
+        return evaluate(logical.right);
     }
 
     @Override

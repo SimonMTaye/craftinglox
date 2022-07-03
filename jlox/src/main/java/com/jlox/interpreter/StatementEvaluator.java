@@ -92,7 +92,7 @@ public class StatementEvaluator implements StatementVisitor<Void> {
 
     @Override
     public Void visitWhileStatement(WhileStatement whilestatement) {
-        while (exprEval.evaluate(whilestatement.condition).equals(true)) {
+        while (whilestatement.condition == null || exprEval.evaluate(whilestatement.condition).equals(true)) {
             execute(whilestatement.body);
         }
         return null;

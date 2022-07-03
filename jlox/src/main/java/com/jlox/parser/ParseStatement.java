@@ -196,11 +196,11 @@ public class ParseStatement extends AbstractParser<Statement> {
         // Transform into a while loop
         ArrayList<Statement> whileBody = new ArrayList<>();
         whileBody.add(body);
-        whileBody.add(post);
+        if (post != null) whileBody.add(post);
 
         WhileStatement whileStmt  = new WhileStatement(condition, new Block(whileBody));
         ArrayList<Statement> forStmts = new ArrayList<>();
-        forStmts.add(init);
+        if (init != null) forStmts.add(init);
         forStmts.add(whileStmt);
         return new Block(forStmts);
     }
