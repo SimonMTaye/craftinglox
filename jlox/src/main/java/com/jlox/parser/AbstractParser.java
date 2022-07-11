@@ -1,11 +1,8 @@
 package com.jlox.parser;
 
-import com.jlox.Lox;
-import com.jlox.error.IErrorHandler;
 import com.jlox.error.LoxError;
 import com.jlox.scanner.Token;
 import com.jlox.scanner.TokenType;
-import com.jlox.statement.Statement;
 
 /**
  * Interface for parsing a list of tokens
@@ -44,15 +41,16 @@ public abstract class AbstractParser<R> {
 
     /**
      * Check if the next token is off the expected type and return it if it is or throw the given error if not
-     * @param type  The desired type
-     * @param e     The error to throw if the next token is of a different type
-     * @return      The token whose token matches the desired type
+     *
+     * @param type    The desired type
+     * @param message The error to throw if the next token is of a different type
+     * @return The token whose token matches the desired type
      */
-    protected Token checkAndAdvance(TokenType type, LoxError e) {
+    protected Token checkAndAdvance(TokenType type, LoxError message) {
         if (check(type)) {
             return tokens.advance();
         }
-        throw e;
+        throw message;
     }
 
     /**

@@ -9,11 +9,13 @@ import com.jlox.scanner.Token;
 import com.jlox.scanner.TokenType;
 import com.jlox.statement.*;
 
+import javax.swing.plaf.nimbus.State;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.jlox.parser.ParseErrorCode.INVALID_INDENTIFIER;
+import static com.jlox.scanner.TokenType.FUN;
+import static com.jlox.scanner.TokenType.VAR;
 
 
 public class ParseStatement extends AbstractParser<Statement> {
@@ -92,7 +94,7 @@ public class ParseStatement extends AbstractParser<Statement> {
             while (!check(TokenType.RIGHT_PAREN) && !tokens.isAtEnd()) {
                 stmts.add(parse());
             }
-            ParseLoxError err = new ParseLoxError("Expected closing '}'", ParseErrorCode.UNCLOSED_BRACE, tokens.previous().offset);
+            ParseLoxError err = new ParseLoxError("Expected closing '}'",  tokens.previous().offset);
             checkAndAdvance(TokenType.RIGHT_PAREN, err);
             return new Block(stmts);
         }
@@ -100,15 +102,21 @@ public class ParseStatement extends AbstractParser<Statement> {
     }
 
     private Statement declaration() {
-        if (check(TokenType.VAR))
-            return varDeclaration();
-        return statement();
+        Token next = tokens.peek();
+        switch (next.type) {
+           case VAR:
+                return varDeclaration();
+           case FUN:
+                return funDeclaration();
+           default:
+                return statement();
+        }
     }
 
     private Statement varDeclaration() {
         // Consume var token
         tokens.advance();
-        ParseLoxError e = new ParseLoxError("Expected Identifier after var keyword", INVALID_INDENTIFIER, tokens.previous().offset);
+        ParseLoxError e = new ParseLoxError("Expected Identifier after var keyword",  tokens.previous().offset);
         Token name = checkAndAdvance(TokenType.IDENTIFIER, e);
         VarDeclare variable;
         // Initialize variable
@@ -122,26 +130,65 @@ public class ParseStatement extends AbstractParser<Statement> {
             // If there's no initializer, create  a null variable
             variable = new VarDeclare(name, new Literal(TokenType.NIL));
         }
-        e = new ParseLoxError("Expected semicolon after variable declaration", ParseErrorCode.MISSING_SEMICOLON, tokens.previous().offset);
+        e = new ParseLoxError("Expected semicolon after variable declaration",  tokens.previous().offset);
         // Check for semicolon
         checkAndAdvance(TokenType.SEMICOLON, e);
 
         return variable;
     }
 
+    private Statement funDeclaration() {
+        // Consume fun token
+        tokens.advance();
+
+        ParseLoxError e = new ParseLoxError("Expected Identifier after fun keyword",  tokens.previous().offset);
+        Token name = checkAndAdvance(TokenType.IDENTIFIER, e);
+
+        e = new ParseLoxError("Expected '( after fun keyword",  tokens.previous().offset);
+        checkAndAdvance(TokenType.LEFT_PAREN, e);
+
+        ParseLoxError expectedID = new ParseLoxError("Expected a valid Identifier after fun keyword",  tokens.previous().offset);
+        List<Token> params = new ArrayList<>();
+
+        if (!check(TokenType.RIGHT_PAREN)) {
+            do {
+                if (params.size() >= 255) {
+                    throw new ParseLoxError("Cannot have more than 255 parameters", tokens.previous().offset);
+                }
+
+                params.add(checkAndAdvance(TokenType.IDENTIFIER, expectedID));
+
+                // Stop iterating if next token is not comma
+                if (!check(TokenType.COMMA)) break;
+                tokens.advance();
+            } while (true);
+        }
+
+        ParseLoxError missingParen = new ParseLoxError("Expected closing ')'",  tokens.previous().offset);
+        checkAndAdvance(TokenType.RIGHT_PAREN, missingParen);
+
+        return new FunDeclare(name, params, (Block) block());
+
+    }
+
     private Statement statement() {
-        Token next = tokens.advance();
+        Token next = tokens.peek();
         switch (next.type) {
             case PRINT:
+                tokens.advance();
                 return printStatement();
             case IF:
+                tokens.advance();
                 return ifStatement();
             case WHILE:
+                tokens.advance();
                 return whileStatement();
             case FOR:
+                tokens.advance();
                 return forStatement();
             case BREAK:
-                throw new ParseLoxError("break statements may only appear within a for or while loop", ParseErrorCode.INVALID_BREAK, next.offset);
+                tokens.advance();
+                throw new ParseLoxError("break statements may only appear within a for or while loop",  next.offset);
             default:
                 return expressionStatement();
         }
@@ -150,7 +197,7 @@ public class ParseStatement extends AbstractParser<Statement> {
     private Statement breakStatement() {
         if (check(TokenType.BREAK)) {
             tokens.advance();
-            ParseLoxError e = new ParseLoxError("Expected semicolon after break statement", ParseErrorCode.MISSING_SEMICOLON, tokens.previous().offset);
+            ParseLoxError e = new ParseLoxError("Expected semicolon after break statement",  tokens.previous().offset);
             checkAndAdvance(TokenType.SEMICOLON, e);
             return new BreakStatement();
         }
@@ -161,7 +208,7 @@ public class ParseStatement extends AbstractParser<Statement> {
     private Statement printStatement() {
         Expression value = exprParser.parse(this.tokens);
         if (!check(TokenType.SEMICOLON)) {
-            throw new ParseLoxError("Expected ';' after value", ParseErrorCode.MISSING_SEMICOLON,tokens.previous().offset);
+            throw new ParseLoxError("Expected ';' after value", tokens.previous().offset);
         }
         return new PrintStatement(value);
 
@@ -196,7 +243,7 @@ public class ParseStatement extends AbstractParser<Statement> {
         if (!check(TokenType.SEMICOLON)) {
             condition = exprParser.parse(this.tokens);
             if (!check(TokenType.SEMICOLON)) {
-                throw new ParseLoxError("Expected ';' after condition", ParseErrorCode.MISSING_SEMICOLON, tokens.previous().offset);
+                throw new ParseLoxError("Expected ';' after condition",  tokens.previous().offset);
             }
         }
         // Consume the semicolon
@@ -221,7 +268,7 @@ public class ParseStatement extends AbstractParser<Statement> {
     private Statement controlFlowStatement() {
         // Check if the next character is a left brace or new line. If so, proceed
         if (!(check(TokenType.LEFT_BRACE) || check(TokenType.NEW_LINE))) {
-            throw new ParseLoxError("Expected '{' or new line after while condition", ParseErrorCode.MISSING_LEFT_BRACE_OR_NL, tokens.previous().offset);
+            throw new ParseLoxError("Expected '{' or new line after while condition",  tokens.previous().offset);
         }
 
         // Consume the new line if it exists
@@ -255,7 +302,7 @@ public class ParseStatement extends AbstractParser<Statement> {
                 tokens.advance();
                 return assignStatement(value);
             default:
-                throw new ParseLoxError("Expected ';' after value", ParseErrorCode.MISSING_SEMICOLON, tokens.previous().offset);
+                throw new ParseLoxError("Expected ';' after value",  tokens.previous().offset);
         }
     }
 
@@ -263,12 +310,12 @@ public class ParseStatement extends AbstractParser<Statement> {
         if (lvalue instanceof Variable) {
             Variable var = (Variable) lvalue;
             Expression rvalue = exprParser.parse(this.tokens);
-            ParseLoxError err =  new ParseLoxError("Expected ';' after value", ParseErrorCode.MISSING_SEMICOLON, tokens.previous().offset);
+            ParseLoxError err =  new ParseLoxError("Expected ';' after value",  tokens.previous().offset);
             checkAndAdvance(TokenType.SEMICOLON, err);
             return new VarAssign(var.name, rvalue);
 
         }
-        throw new ParseLoxError("Cannot assign value to " + lvalue.toString(), ParseErrorCode.INVALID_LVALUE, tokens.previous().offset);
+        throw new ParseLoxError("Cannot assign value to " + lvalue.toString(),  tokens.previous().offset);
 
     }
 }

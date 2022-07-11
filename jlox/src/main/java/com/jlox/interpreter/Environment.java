@@ -1,15 +1,12 @@
 package com.jlox.interpreter;
 
-import com.jlox.expression.Expression;
-import com.jlox.expression.Variable;
-import com.jlox.parser.ParseErrorCode;
-import com.jlox.parser.ParseLoxError;
+import com.jlox.scanner.Token;
 
 import java.util.HashMap;
 
 public class Environment {
 
-    private final HashMap<String, Expression> mappings = new HashMap<>();
+    private final HashMap<String, Object> mappings = new HashMap<>();
     private final Environment parent;
 
     public Environment(Environment parent) {
@@ -27,52 +24,46 @@ public class Environment {
 
     /**
      * Get the value of a variable. Throws and error if the variable doesn't exist
-     * @param variable the variable
+     * @param name the name of the variable
      * @return the value stored for the variable
      */
-    public Expression getValue(Variable variable) {
-        return getValue(getName(variable), getOffset(variable));
+    public Object getValue(Token name) {
+        return getValue(name.lexme);
     }
 
     /**
      * Set the value of a variable. If the variable has already been declared, this will throw an error
-     * @param variable the variable to define
+     * @param name the variable to define
      * @param value the value of the variable
      */
-    public void defineVariable(Variable variable, Expression value) {
-        String name = getName(variable);
-        if (mappings.containsKey(name)) {
-            throw new ParseLoxError(name + " has already been declared",ParseErrorCode.EXISTING_VARIABLE, getOffset(variable));
+    public void defineVariable(Token name, Object value) {
+        if (mappings.containsKey(name.lexme)) {
+            throw new RuntimeError(name + " has already been declared");
         }
-        mappings.put(name, value);
+        mappings.put(name.lexme, value);
     }
 
     /**
      * Change the value of a variable. Throws an error if the value doesn't already exist in itself or its parents
-     * @param variable the variable to be reassigned
+     * @param name the variable to be reassigned
      * @param value the new value
      */
-    public void changeValue(Variable variable, Expression value) {
-        if (!mappings.containsKey(getName(variable))) {
+    public void changeValue(Token name, Object value) {
+        if (!mappings.containsKey(name.lexme)) {
             if (parent == null)
-                throw new ParseLoxError(getName(variable) + " has not been declared",ParseErrorCode.UNDEFINED_VALUE, getOffset(variable));
-            parent.changeValue(variable, value);
+                throw new RuntimeError("Undefined variable " + name.lexme);
+            parent.changeValue(name, value);
         }
-        mappings.put(getName(variable), value);
+        mappings.put(name.lexme, value);
     }
 
-    private Expression getValue(String key, int offset) {
+    private Object getValue(String key) {
         if (this.mappings.containsKey(key)) return mappings.get(key);
-        if (this.parent != null) return parent.getValue(key, offset);
-        throw new ParseLoxError(key + " is an undefined variable", ParseErrorCode.UNDEFINED_VALUE, offset);
+        if (this.parent != null) return parent.getValue(key);
+        throw new RuntimeError(key + " is an undefined variable");
     }
 
-    private String getName(Variable var) {
-        return var.name.lexme;
+    protected void defineInterpreterGlobal(String name, Object value) {
+        mappings.put(name, value);
     }
-
-    private int getOffset(Variable var) {
-        return var.name.offset;
-    }
-
 }

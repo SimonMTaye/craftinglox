@@ -47,4 +47,15 @@ public class AstPrinter implements ExpressionVisitor<String> {
     public String visitVariable(Variable variable) {
         return String.format("$(%s)", variable.name.lexme);
     }
+
+    @Override
+    public String visitCall(Call call) {
+        StringBuilder builder = new StringBuilder();
+        builder.append(String.format("(%s", call.callee.accept(this)));
+        for (Expression arg : call.arguments) {
+            builder.append(String.format(" %s", arg.accept(this)));
+        }
+        builder.append(")");
+        return builder.toString();
+    }
 }

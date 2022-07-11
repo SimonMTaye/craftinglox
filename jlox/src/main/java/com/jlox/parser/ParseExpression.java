@@ -6,6 +6,7 @@ import com.jlox.expression.*;
 import com.jlox.scanner.Token;
 import com.jlox.scanner.TokenType;
 
+import java.util.ArrayList;
 import java.util.function.Function;
 
 /**
@@ -71,7 +72,7 @@ public class ParseExpression extends AbstractParser<Expression> {
                 Expression right = ternary();
                 return new Ternary(expr, left, right);
             }
-            throw  new ParseLoxError("Expected ':' to match '?'", ParseErrorCode.MISSING_COLON, tokens.previous().offset);
+            throw  new ParseLoxError("Expected ':' to match '?'", tokens.previous().offset);
         }
         return expr;
     }
@@ -118,7 +119,31 @@ public class ParseExpression extends AbstractParser<Expression> {
             Token operator = tokens.advance();
             return new Unary(operator, unary());
         }
-        return primary();
+        return call();
+    }
+
+    private Expression call() {
+        Expression expr = primary();
+
+        if (check(TokenType.LEFT_PAREN)) {
+            ArrayList<Expression> args = new ArrayList<>();
+            while(!check(TokenType.RIGHT_PAREN)) {
+                if (args.size() > 255) {
+                    throw new ParseLoxError("Cannot have more than 255 arguments", tokens.peek().offset);
+                }
+                args.add(expression());
+                if (check(TokenType.RIGHT_PAREN)) {
+                    break;
+                }
+                if (!check(TokenType.COMMA)) {
+                    throw new ParseLoxError("Expected ',' or ')'", tokens.previous().offset);
+                }
+                // Consume comma
+                tokens.advance();
+            }
+            return new Call(expr, args);
+        }
+        return expr;
     }
     // primary -> NUMBER | STRING | 'true | 'false' | 'nil' | IDENTIFIER |  '(' expression ')'
     private Expression primary() {
@@ -138,9 +163,9 @@ public class ParseExpression extends AbstractParser<Expression> {
                 tokens.advance();
                 return grouping;
             }
-            throw new ParseLoxError("Expected a ')'", ParseErrorCode.UNCLOSED_PAREN, tokens.previous().offset);
+            throw new ParseLoxError("Expected a ')'",  tokens.previous().offset);
         }
-        throw new ParseLoxError("Expected an expression", ParseErrorCode.NO_EXPRESSION, tokens.previous().offset);
+        throw new ParseLoxError("Expected an expression",  tokens.previous().offset);
     }
 
     // Helper method for matching pattern used in equality, comparison, term and factor

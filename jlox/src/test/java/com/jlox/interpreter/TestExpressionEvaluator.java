@@ -110,7 +110,7 @@ public class TestExpressionEvaluator {
     void TestVariables() {
         Environment scope = new Environment();
         Variable test1 = new Variable(getIdentifier("test1"));
-        scope.defineVariable(test1, new Literal(true));
+        scope.defineVariable(test1.name, true);
         ExpressionEvaluator e = new ExpressionEvaluator(scope);
         assertEquals(true, e.evaluate(test1));
     }

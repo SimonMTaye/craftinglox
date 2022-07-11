@@ -42,7 +42,7 @@ public class TestStatementParser {
     void TestVarAssign(){
         ParseStatement parser = new ParseStatement();
         final Token[] badTokens = new Token[]{emptyToken(TokenType.IDENTIFIER), emptyToken(TokenType.EQUAL), emptyToken(TokenType.INTEGER)};
-        assertThrows(ParseLoxError.class, () -> parser.parse(List.of(badTokens)), "Expect error due to missing semicolon");
+        assertThrows(RuntimeException.class, () -> parser.parse(List.of(badTokens)), "Expect error due to missing semicolon");
 
         final Token[] tokens = new Token[]{emptyToken(TokenType.IDENTIFIER), emptyToken(TokenType.EQUAL), emptyToken(TokenType.INTEGER), emptyToken(TokenType.SEMICOLON)};
         assertInstanceOf(VarAssign.class, parser.parse(List.of(tokens)), "Expected variable declaration statement");

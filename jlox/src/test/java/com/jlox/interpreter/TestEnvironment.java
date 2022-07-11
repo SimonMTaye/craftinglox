@@ -1,9 +1,5 @@
 package com.jlox.interpreter;
 
-import com.jlox.expression.Expression;
-import com.jlox.expression.Literal;
-import com.jlox.expression.Variable;
-import com.jlox.parser.ParseLoxError;
 import com.jlox.scanner.Token;
 import com.jlox.scanner.TokenType;
 import org.junit.jupiter.api.Test;
@@ -12,14 +8,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TestEnvironment {
 
-    private static final ExpressionEvaluator eval = new ExpressionEvaluator();
-
     private Token getIdentifier(String name) {
         return new Token(TokenType.IDENTIFIER, name, name, 0);
-    }
-
-    private Object evalExpression(Expression expr) {
-        return eval.evaluate(expr);
     }
 
     /**
@@ -29,97 +19,97 @@ public class TestEnvironment {
     void TestGlobalAssign() {
         // Check that a value is assigned correctly
         Environment globalEnv = new Environment();
-        Variable test1 = new Variable(getIdentifier("test1"));
-        globalEnv.defineVariable(test1, new Literal("Hello World"));
-        assertEquals("Hello World", evalExpression(globalEnv.getValue(test1)));
+        Token test1 = getIdentifier("test1");
+        globalEnv.defineVariable(test1, "Hello World");
+        assertEquals("Hello World", globalEnv.getValue(test1));
     }
 
     @Test
     void TestGlobalReAssign() {
         // Check that a value is assigned correctly
         Environment globalEnv = new Environment();
-        Variable test1 = new Variable(getIdentifier("test1"));
-        globalEnv.defineVariable(test1, new Literal("Hello World"));
-        globalEnv.changeValue(test1, new Literal(true));
-        assertEquals(true, evalExpression(globalEnv.getValue(test1)));
+        Token test1 = getIdentifier("test1");
+        globalEnv.defineVariable(test1, "Hello World");
+        globalEnv.changeValue(test1, true);
+        assertEquals(true, globalEnv.getValue(test1));
     }
 
     @Test
     void TestScopedAssignAndReassign() {
         // Check that a value is assigned correctly
         Environment globalEnv = new Environment();
-        Variable test1 = new Variable(getIdentifier("test1"));
-        globalEnv.defineVariable(test1, new Literal("Hello World"));
+        Token test1 = getIdentifier("test1");
+        globalEnv.defineVariable(test1, "Hello World");
         Environment scopedEnv = new Environment(globalEnv);
         // Test that scopedEnv can read from its parent
-        assertEquals("Hello World", evalExpression(scopedEnv.getValue(test1)));
+        assertEquals("Hello World", scopedEnv.getValue(test1));
 
         // Test that scopedEnv variable can be redefined
-        scopedEnv.defineVariable(test1, new Literal("Blue"));
-        assertEquals("Blue", evalExpression(scopedEnv.getValue(test1)));
+        scopedEnv.defineVariable(test1, "Blue");
+        assertEquals("Blue", scopedEnv.getValue(test1));
 
-        scopedEnv.changeValue(test1, new Literal("Simon"));
-        assertEquals("Simon", evalExpression(scopedEnv.getValue(test1)));
+        scopedEnv.changeValue(test1, "Simon");
+        assertEquals("Simon", scopedEnv.getValue(test1));
         // Test that globalEnv variable is unaffected by redefinition
-        assertEquals("Hello World", evalExpression(globalEnv.getValue(test1)));
+        assertEquals("Hello World", globalEnv.getValue(test1));
 
-        Variable test2 = new Variable(getIdentifier("test2"));
-        scopedEnv.defineVariable(test2, new Literal(true));
-        assertEquals(true, evalExpression(scopedEnv.getValue(test2)));
+        Token test2 = getIdentifier("test2");
+        scopedEnv.defineVariable(test2, true);
+        assertEquals(true, scopedEnv.getValue(test2));
 
-        // Test that varibles defined in scopedEnv aren't available in the parent
+        // Test that variables defined in scopedEnv aren't available in the parent
         assertThrows(
-            ParseLoxError.class,
+            RuntimeError.class,
             () -> globalEnv.getValue(test2)
         );
     }
     /**
      * Test that a global environment (i.e. one with no parents) throws an error when fetching or changing a variable
-     * that isn't defined and re-defining an exisiting variable
+     * that isn't defined and re-defining an existing variable
      */
     @Test
     void TestGlobalAssignError() {
         // Check that a value is assigned correctly
         Environment globalEnv = new Environment();
-        Variable test1 = new Variable(getIdentifier("test1"));
+        Token test1 = getIdentifier("test1");
         assertThrows(
-            ParseLoxError.class,
+            RuntimeError.class,
             () -> globalEnv.getValue(test1)
         );
 
         assertThrows(
-            ParseLoxError.class,
-            () -> globalEnv.changeValue(test1, new Literal("Hello World"))
+            RuntimeError.class,
+            () -> globalEnv.changeValue(test1, "Hello World")
         );
 
-        globalEnv.defineVariable(test1, new Literal("Hello World"));
+        globalEnv.defineVariable(test1,  "Hello World");
         assertThrows(
-            ParseLoxError.class,
-            () -> globalEnv.defineVariable(test1, new Literal("Simon"))
+            RuntimeError.class,
+            () -> globalEnv.defineVariable(test1, "Simon")
         );
     }
     /**
-     * Test that a global environment throws and error when reassigning a varible that doesn't exist
+     * Test that a global environment throws and error when reassigning a variable that doesn't exist
      */
     @Test
     void TestScopedError() {
         // Check that a value is assigned correctly
         Environment globalEnv = new Environment();
-        Variable test1 = new Variable(getIdentifier("test1"));
+        Token test1 = getIdentifier("test1");
         Environment scopedEnv = new Environment(globalEnv);
         assertThrows(
-            ParseLoxError.class,
-            () -> scopedEnv.changeValue(test1, new Literal("Hello World"))
+            RuntimeError.class,
+            () -> scopedEnv.changeValue(test1, "Hello World")
         );
         assertThrows(
-            ParseLoxError.class,
+            RuntimeError.class,
             () -> scopedEnv.getValue(test1)
         );
 
-        scopedEnv.defineVariable(test1, new Literal("Hello World"));
+        scopedEnv.defineVariable(test1, "Hello World");
         assertThrows(
-            ParseLoxError.class,
-            () -> scopedEnv.defineVariable(test1, new Literal("Simon"))
+            RuntimeError.class,
+            () -> scopedEnv.defineVariable(test1, "Simon")
         );
     }
 

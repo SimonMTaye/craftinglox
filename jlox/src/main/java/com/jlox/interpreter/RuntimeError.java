@@ -4,14 +4,8 @@ import com.jlox.error.LoxError;
 
 public class RuntimeError extends LoxError {
 
-    private final RuntimeErrorType type;
-
-    public RuntimeError(RuntimeErrorType type, String message) {
-        super(message, type.getCode(), -1);
-        this.type = type;
+    public RuntimeError(String message) {
+        super(message, "RUNTIME_ERROR", -1);
     }
 
-    public RuntimeErrorType getType() {
-        return type;
-    }
 }

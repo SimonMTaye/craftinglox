@@ -1,6 +1,7 @@
 Expression
 $package com.jlox.expression;
 *import com.jlox.scanner.Token;
+*import java.util.List;
 !src\main\java\com\jlox\expression
 Binary Expression left Token operator Expression right
 Logical Expression left Token operator Expression right
@@ -9,3 +10,4 @@ Literal Object value
 Unary Token operator Expression right
 Ternary Expression condition Expression left Expression right
 Variable Token name
+Call Expression callee List<Expression> arguments

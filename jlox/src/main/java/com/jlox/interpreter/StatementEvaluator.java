@@ -1,14 +1,12 @@
 package com.jlox.interpreter;
 
 
-import com.jlox.expression.Variable;
 import com.jlox.statement.*;
 
 public class StatementEvaluator implements StatementVisitor<Void> {
 
     private Environment scope;
     private final ExpressionEvaluator exprEval;
-    private int nestingLevel = 0;
 
 
 
@@ -29,7 +27,6 @@ public class StatementEvaluator implements StatementVisitor<Void> {
      */
     private void nestScope() {
         scope = new Environment(scope);
-        nestingLevel++;
     }
 
     /**
@@ -37,7 +34,6 @@ public class StatementEvaluator implements StatementVisitor<Void> {
      */
     private void unnestScope() {
         scope = scope.getHigherScope();
-        nestingLevel--;
     }
 
 
@@ -62,13 +58,13 @@ public class StatementEvaluator implements StatementVisitor<Void> {
 
     @Override
     public Void visitVarDeclare(VarDeclare varDeclare) {
-        scope.defineVariable(new Variable(varDeclare.name), varDeclare.init);
+        scope.defineVariable(varDeclare.name, exprEval.evaluate(varDeclare.init));
         return null;
     }
 
     @Override
     public Void visitVarAssign(VarAssign varAssign) {
-        scope.changeValue(new Variable(varAssign.name), varAssign.newVal);
+        scope.changeValue(varAssign.name, exprEval.evaluate(varAssign.newVal));
         return null;
     }
 
@@ -112,6 +108,11 @@ public class StatementEvaluator implements StatementVisitor<Void> {
     @Override
     public Void visitBreakStatement(BreakStatement breakstatement) {
         throw new BreakException();
+    }
+
+    @Override
+    public Void visitFunDeclare(FunDeclare fundeclare) {
+        return null;
     }
 
 

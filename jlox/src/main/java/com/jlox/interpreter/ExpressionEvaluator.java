@@ -4,6 +4,8 @@ import com.jlox.expression.*;
 import com.jlox.scanner.Token;
 import com.jlox.scanner.TokenType;
 
+import java.util.ArrayList;
+
 public class ExpressionEvaluator implements ExpressionVisitor<Object> {
 
     private Environment scope;
@@ -38,16 +40,35 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
                 if (right instanceof Integer) {
                     return -1 * (Integer) right;
                 }
-                throw new RuntimeError(RuntimeErrorType.TYPE_ERROR, "Expected a number.");
+                throw new RuntimeError( "Expected a number.");
             }
         }
-        throw new RuntimeError(RuntimeErrorType.UNEXPECTED_OPERATOR, String.format("Unknown operator '%s'", unary.operator.lexme));
+        throw new RuntimeError( String.format("Unknown operator '%s'", unary.operator.lexme));
     }
 
     @Override
     public Object visitVariable(Variable variable) {
-        Expression expr = scope.getValue(variable);
-        return expr.accept(this);
+        return scope.getValue(variable.name);
+    }
+
+    @Override
+    public Object visitCall(Call call) {
+        Object callee = evaluate(call.callee);
+        if (!(callee instanceof LoxCallable)) {
+            throw new RuntimeError(callee.toString() + "is not callable");
+        }
+        LoxCallable function = (LoxCallable) callee;
+
+        ArrayList<Object> arguments = new ArrayList<>();
+        for (Expression expr : call.arguments) {
+            arguments.add(evaluate(expr));
+        }
+
+        if (arguments.size() != function.arity()) {
+            throw new RuntimeError(String.format("Expected %d arguments but got %d.", function.arity(), arguments.size()));
+        }
+
+        return function.call(arguments);
     }
 
     @Override
@@ -75,7 +96,7 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
                 return operate(left, right, binary.operator);
             }
         }
-        throw new RuntimeError(RuntimeErrorType.TYPE_ERROR, String.format("%s is not supported for %s and %s", binary.operator.lexme, left.getClass(), right.getClass()));
+        throw new RuntimeError( String.format("%s is not supported for %s and %s", binary.operator.lexme, left.getClass(), right.getClass()));
     }
 
     // Logical operator with short-circuiting
@@ -116,7 +137,7 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
         if (object instanceof Boolean) {
             return (Boolean) object;
         }
-        throw new RuntimeError(RuntimeErrorType.TYPE_ERROR, "Expected a boolean.");
+        throw new RuntimeError( "Expected a boolean.");
     }
 
     private Object operate(Object left, Object right, Token operator) {
@@ -126,7 +147,7 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
             return operate(leftNum.doubleValue(), rightNum.doubleValue(), operator.type);
         }
         if (!(left instanceof Integer) || !(right instanceof Integer)) {
-            throw new RuntimeError(RuntimeErrorType.TYPE_ERROR, String.format("%s is not supported on %s and %s",
+            throw new RuntimeError( String.format("%s is not supported on %s and %s",
                 operator.lexme, left.getClass(), right.getClass()));
         }
         return operate((Integer) left, (Integer) right, operator.type);
@@ -143,7 +164,7 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
                 return left + right;
             case SLASH: {
                 if (right.equals(0d)) {
-                    throw new RuntimeError(RuntimeErrorType.DIVIDE_BY_ZERO, "Cannot divide by 0");
+                    throw new RuntimeError( "Cannot divide by 0");
                 }
                 return left / right;
             }
@@ -169,7 +190,7 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
                 return left + right;
             case SLASH: {
                 if (right.equals(0)) {
-                    throw new RuntimeError(RuntimeErrorType.DIVIDE_BY_ZERO, "Cannot divide by 0");
+                    throw new RuntimeError( "Cannot divide by 0");
                 }
                 return left / right;
             }
