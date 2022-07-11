@@ -24,7 +24,11 @@ public class LoxFunction implements LoxCallable {
         for (int i = 0; i < declaration.params.size(); i++) {
             environment.defineVariable(declaration.params.get(i), arguments.get(i));
         }
-        smtEval.executeScoped(declaration.body, environment);
+        try {
+            smtEval.executeScoped(declaration.body, environment);
+        } catch (ReturnException returnValue) {
+            return returnValue.value;
+        }
         return null;
     }
 }

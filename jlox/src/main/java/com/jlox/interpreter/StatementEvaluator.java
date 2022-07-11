@@ -122,5 +122,10 @@ public class StatementEvaluator implements StatementVisitor<Void> {
         return null;
     }
 
+    @Override
+    public Void visitReturnStatement(ReturnStatement returnstatement) {
+        throw new ReturnException(exprEval.evaluate(returnstatement.value));
+    }
+
 
 }

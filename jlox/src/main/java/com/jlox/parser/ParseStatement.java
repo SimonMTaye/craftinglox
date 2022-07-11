@@ -175,17 +175,15 @@ public class ParseStatement extends AbstractParser<Statement> {
         Token next = tokens.peek();
         switch (next.type) {
             case PRINT:
-                tokens.advance();
                 return printStatement();
             case IF:
-                tokens.advance();
                 return ifStatement();
             case WHILE:
-                tokens.advance();
                 return whileStatement();
             case FOR:
-                tokens.advance();
                 return forStatement();
+            case RETURN:
+                return returnStatement();
             case BREAK:
                 tokens.advance();
                 throw new ParseLoxError("break statements may only appear within a for or while loop",  next.offset);
@@ -194,18 +192,10 @@ public class ParseStatement extends AbstractParser<Statement> {
         }
     }
 
-    private Statement breakStatement() {
-        if (check(TokenType.BREAK)) {
-            tokens.advance();
-            ParseLoxError e = new ParseLoxError("Expected semicolon after break statement",  tokens.previous().offset);
-            checkAndAdvance(TokenType.SEMICOLON, e);
-            return new BreakStatement();
-        }
-        return statement();
-    }
 
 
     private Statement printStatement() {
+        tokens.advance();
         Expression value = exprParser.parse(this.tokens);
         if (!check(TokenType.SEMICOLON)) {
             throw new ParseLoxError("Expected ';' after value", tokens.previous().offset);
@@ -216,6 +206,7 @@ public class ParseStatement extends AbstractParser<Statement> {
 
     // Grammar IF Expression (Block | '\n'Statement) (ELSE Statement)?
     private Statement ifStatement() {
+        tokens.advance();
         Expression condition = exprParser.parse(this.tokens);
         Statement ifBranch = controlFlowStatement();
 
@@ -230,6 +221,7 @@ public class ParseStatement extends AbstractParser<Statement> {
 
     // Grammar WHILE Expression (Block | '\n'Statement)
     private Statement whileStatement() {
+        tokens.advance();
         Expression condition = exprParser.parse(this.tokens);
         return new WhileStatement(condition, controlFlowStatement());
     }
@@ -237,6 +229,7 @@ public class ParseStatement extends AbstractParser<Statement> {
 
     // Grammar FOR (Expression)?; (Expression)? ; (Expression)? (Block | '\n'Statement)
     private Statement forStatement() {
+        tokens.advance();
         Statement init = forGetStatement();
 
         Expression condition = null;
@@ -279,6 +272,21 @@ public class ParseStatement extends AbstractParser<Statement> {
     }
 
     /**
+     * Helper function for parsing statements where break is allowed (i.e. for and while loops)
+     * @return a statement
+     */
+    private Statement breakStatement() {
+        if (check(TokenType.BREAK)) {
+            tokens.advance();
+            ParseLoxError e = new ParseLoxError("Expected semicolon after break statement",  tokens.previous().offset);
+            checkAndAdvance(TokenType.SEMICOLON, e);
+            return new BreakStatement();
+        }
+        return statement();
+    }
+
+
+    /**
      * Helper function for parsing for statement syntax. Parses (statement | ';')
      * @return statement or null
      */
@@ -317,5 +325,13 @@ public class ParseStatement extends AbstractParser<Statement> {
         }
         throw new ParseLoxError("Cannot assign value to " + lvalue.toString(),  tokens.previous().offset);
 
+    }
+
+    private Statement returnStatement() {
+        tokens.advance();
+        Expression value = exprParser.parse(this.tokens);
+        ParseLoxError err =  new ParseLoxError("Expected ';' after value",  tokens.previous().offset);
+        checkAndAdvance(TokenType.SEMICOLON, err);
+        return new ReturnStatement(value);
     }
 }

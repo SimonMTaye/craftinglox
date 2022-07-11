@@ -13,3 +13,4 @@ IfStatement Expression condition Statement thenBranch Statement elseBranch
 WhileStatement Expression condition Statement body
 BreakStatement
 FunDeclare Token name List<Token> params Block body
+ReturnStatement Expression value

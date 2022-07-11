@@ -1,7 +1,7 @@
 package com.jlox.interpreter;
 
-public class BreakException extends RuntimeError {
+public class BreakException extends RuntimeException {
     public BreakException() {
-        super("break");
+        super(null, null, false, false);
     }
 }

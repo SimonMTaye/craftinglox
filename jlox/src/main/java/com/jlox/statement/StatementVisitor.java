@@ -11,4 +11,5 @@ public interface StatementVisitor<R> {
 	public R visitWhileStatement(WhileStatement whilestatement);
 	public R visitBreakStatement(BreakStatement breakstatement);
 	public R visitFunDeclare(FunDeclare fundeclare);
+	public R visitReturnStatement(ReturnStatement returnstatement);
 }
