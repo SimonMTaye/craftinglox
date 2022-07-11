@@ -5,20 +5,21 @@ import com.jlox.statement.*;
 
 public class StatementEvaluator implements StatementVisitor<Void> {
 
-    private Environment scope;
+    protected Environment scope;
     private final ExpressionEvaluator exprEval;
 
 
 
     public StatementEvaluator() {
         this.scope = new Environment();
-        this.exprEval = new ExpressionEvaluator(scope);
+        this.exprEval = new ExpressionEvaluator(this);
     }
 
     public StatementEvaluator(Environment global) {
         this.scope = global;
-        this.exprEval = new ExpressionEvaluator(scope);
+        this.exprEval = new ExpressionEvaluator(this);
     }
+
 
     // Handle Scoping
 
@@ -42,7 +43,12 @@ public class StatementEvaluator implements StatementVisitor<Void> {
         return null;
     }
 
-
+    public void executeScoped(Statement stmt, Environment scope) {
+        Environment oldScope = this.scope;
+        this.scope = scope;
+        execute(stmt);
+        this.scope = oldScope;
+    }
 
     @Override
     public Void visitPrintStatement(PrintStatement printstatement) {
@@ -112,6 +118,7 @@ public class StatementEvaluator implements StatementVisitor<Void> {
 
     @Override
     public Void visitFunDeclare(FunDeclare fundeclare) {
+        scope.defineVariable(fundeclare.name, new LoxFunction(fundeclare));
         return null;
     }
 

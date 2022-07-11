@@ -9,6 +9,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class TestExpressionEvaluator {
+
+    ExpressionEvaluator getEvaluator(Environment scope) {
+        StatementEvaluator statementEvaluator = new StatementEvaluator(scope);
+        return new ExpressionEvaluator(statementEvaluator);
+    }
+
+    ExpressionEvaluator getEvaluator() {
+        StatementEvaluator statementEvaluator = new StatementEvaluator();
+        return new ExpressionEvaluator(statementEvaluator);
+    }
     @Test
     void TestUnary() {
         Unary unary = new Unary(new Token(TokenType.BANG, "!", null, 0), new Literal(true));
@@ -111,12 +121,12 @@ public class TestExpressionEvaluator {
         Environment scope = new Environment();
         Variable test1 = new Variable(getIdentifier("test1"));
         scope.defineVariable(test1.name, true);
-        ExpressionEvaluator e = new ExpressionEvaluator(scope);
+        ExpressionEvaluator e = getEvaluator(scope);
         assertEquals(true, e.evaluate(test1));
     }
 
     Object evaluate(Expression expr) {
-        ExpressionEvaluator e = new ExpressionEvaluator();
+        ExpressionEvaluator e = getEvaluator();
         return e.evaluate(expr);
     }
 

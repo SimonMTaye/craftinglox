@@ -28,10 +28,14 @@ public class Interpreter {
             }
 
             @Override
-            public Object call(List<Object> arguments) {
+            public Object call(StatementEvaluator statementEvaluator, List<Object> arguments) {
                 return System.currentTimeMillis();
             }
         });
+    }
+
+    public Environment getScope() {
+        return stmtEval.scope;
     }
 
 

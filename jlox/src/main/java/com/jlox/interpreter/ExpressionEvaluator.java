@@ -8,20 +8,10 @@ import java.util.ArrayList;
 
 public class ExpressionEvaluator implements ExpressionVisitor<Object> {
 
-    private Environment scope;
+    private StatementEvaluator stmtEval;
 
-
-
-    public ExpressionEvaluator() {
-        this.scope = new Environment();
-    }
-
-    public ExpressionEvaluator(Environment env) {
-        this.scope = env;
-    }
-
-    public void setScope(Environment scope) {
-        this.scope = scope;
+    public ExpressionEvaluator(StatementEvaluator  stmtEval) {
+        this.stmtEval = stmtEval;
     }
 
     public Object evaluate(Expression expression) {
@@ -48,7 +38,7 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
 
     @Override
     public Object visitVariable(Variable variable) {
-        return scope.getValue(variable.name);
+        return stmtEval.scope.getValue(variable.name);
     }
 
     @Override
@@ -68,7 +58,7 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
             throw new RuntimeError(String.format("Expected %d arguments but got %d.", function.arity(), arguments.size()));
         }
 
-        return function.call(arguments);
+        return function.call(stmtEval, arguments);
     }
 
     @Override
