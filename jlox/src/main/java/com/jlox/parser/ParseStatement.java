@@ -9,14 +9,8 @@ import com.jlox.scanner.Token;
 import com.jlox.scanner.TokenType;
 import com.jlox.statement.*;
 
-import javax.swing.plaf.nimbus.State;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.jlox.scanner.TokenType.FUN;
-import static com.jlox.scanner.TokenType.VAR;
-
 
 public class ParseStatement extends AbstractParser<Statement> {
 
@@ -116,8 +110,7 @@ public class ParseStatement extends AbstractParser<Statement> {
     private Statement varDeclaration() {
         // Consume var token
         tokens.advance();
-        ParseLoxError e = new ParseLoxError("Expected Identifier after var keyword",  tokens.previous().offset);
-        Token name = checkAndAdvance(TokenType.IDENTIFIER, e);
+        Token name = checkAndAdvance(TokenType.IDENTIFIER,newError("Expected Identifier after var keyword"));
         VarDeclare variable;
         // Initialize variable
         if (check(TokenType.EQUAL)) {
@@ -130,43 +123,30 @@ public class ParseStatement extends AbstractParser<Statement> {
             // If there's no initializer, create  a null variable
             variable = new VarDeclare(name, new Literal(TokenType.NIL));
         }
-        e = new ParseLoxError("Expected semicolon after variable declaration",  tokens.previous().offset);
         // Check for semicolon
-        checkAndAdvance(TokenType.SEMICOLON, e);
-
+        checkAndAdvance(TokenType.SEMICOLON, newError("Expected ';' after variable declaration"));
         return variable;
     }
 
     private Statement funDeclaration() {
         // Consume fun token
         tokens.advance();
-
-        ParseLoxError e = new ParseLoxError("Expected Identifier after fun keyword",  tokens.previous().offset);
-        Token name = checkAndAdvance(TokenType.IDENTIFIER, e);
-
-        e = new ParseLoxError("Expected '( after fun keyword",  tokens.previous().offset);
-        checkAndAdvance(TokenType.LEFT_PAREN, e);
-
-        ParseLoxError expectedID = new ParseLoxError("Expected a valid Identifier after fun keyword",  tokens.previous().offset);
+        Token name = checkAndAdvance(TokenType.IDENTIFIER, newError("Expected identifier after function keyword"));
+        checkAndAdvance(TokenType.LEFT_PAREN, newError("Expected '(' after function name"));
         List<Token> params = new ArrayList<>();
-
         if (!check(TokenType.RIGHT_PAREN)) {
             do {
                 if (params.size() >= 255) {
                     throw new ParseLoxError("Cannot have more than 255 parameters", tokens.previous().offset);
                 }
-
-                params.add(checkAndAdvance(TokenType.IDENTIFIER, expectedID));
-
+                Token param = checkAndAdvance(TokenType.IDENTIFIER, newError("Expected a valid Identifier after fun keyword"));
+                params.add(param);
                 // Stop iterating if next token is not comma
                 if (!check(TokenType.COMMA)) break;
                 tokens.advance();
             } while (true);
         }
-
-        ParseLoxError missingParen = new ParseLoxError("Expected closing ')'",  tokens.previous().offset);
-        checkAndAdvance(TokenType.RIGHT_PAREN, missingParen);
-
+        checkAndAdvance(TokenType.RIGHT_PAREN, newError("Expected closing ')'"));
         return new FunDeclare(name, params, (Block) block());
 
     }
@@ -191,24 +171,25 @@ public class ParseStatement extends AbstractParser<Statement> {
                 return expressionStatement();
         }
     }
-
-
+    private Statement returnStatement() {
+        tokens.advance();
+        Expression value = exprParser.parse(this.tokens);
+        checkAndAdvance(TokenType.SEMICOLON, newError("Expected ';' after value"));
+        return new ReturnStatement(value);
+    }
 
     private Statement printStatement() {
         tokens.advance();
         Expression value = exprParser.parse(this.tokens);
-        if (!check(TokenType.SEMICOLON)) {
-            throw new ParseLoxError("Expected ';' after value", tokens.previous().offset);
-        }
+        checkAndAdvance(TokenType.SEMICOLON, newError("Expected ';' after value"));
         return new PrintStatement(value);
-
     }
 
     // Grammar IF Expression (Block | '\n'Statement) (ELSE Statement)?
     private Statement ifStatement() {
         tokens.advance();
         Expression condition = exprParser.parse(this.tokens);
-        Statement ifBranch = controlFlowStatement();
+        Statement ifBranch = breakStatement();
 
         Statement elseBranch = null;
         if (check(TokenType.ELSE)) {
@@ -222,28 +203,34 @@ public class ParseStatement extends AbstractParser<Statement> {
     // Grammar WHILE Expression (Block | '\n'Statement)
     private Statement whileStatement() {
         tokens.advance();
-        Expression condition = exprParser.parse(this.tokens);
-        return new WhileStatement(condition, controlFlowStatement());
+        checkAndAdvance(TokenType.LEFT_PAREN, newError("Expected '(' after while keyword"));
+        Expression condition = check(TokenType.RIGHT_PAREN) ? null: exprParser.parse(this.tokens);
+        checkAndAdvance(TokenType.RIGHT_PAREN, newError("Expected ')' after expression"));
+        return new WhileStatement(condition, breakStatement());
     }
 
 
     // Grammar FOR (Expression)?; (Expression)? ; (Expression)? (Block | '\n'Statement)
     private Statement forStatement() {
         tokens.advance();
-        Statement init = forGetStatement();
 
-        Expression condition = null;
-        if (!check(TokenType.SEMICOLON)) {
-            condition = exprParser.parse(this.tokens);
-            if (!check(TokenType.SEMICOLON)) {
-                throw new ParseLoxError("Expected ';' after condition",  tokens.previous().offset);
-            }
-        }
-        // Consume the semicolon
+        checkAndAdvance(TokenType.LEFT_PAREN, newError("Expected '(' after for keyword"));
+
+        Statement init = check(TokenType.SEMICOLON) ? null : new ExprStatement(exprParser.parse(this.tokens));
+        checkAndAdvance(TokenType.SEMICOLON, newError("Expected ';' after initializer"));
         tokens.advance();
 
-        Statement post = forGetStatement();
-        Statement body = controlFlowStatement();
+        Expression condition = check(TokenType.SEMICOLON) ? null : exprParser.parse(this.tokens);
+        checkAndAdvance(TokenType.SEMICOLON, newError("Expected ';' after condition"));
+        tokens.advance();
+
+        Statement post = check(TokenType.SEMICOLON) ? null : new ExprStatement(exprParser.parse(this.tokens));
+        checkAndAdvance(TokenType.SEMICOLON, newError("Expected ';' after post statement"));
+        tokens.advance();
+
+        checkAndAdvance(TokenType.RIGHT_PAREN, newError("Expected ')' after post for statement"));
+
+        Statement body = breakStatement();
 
         // Transform into a while loop
         ArrayList<Statement> whileBody = new ArrayList<>();
@@ -257,20 +244,6 @@ public class ParseStatement extends AbstractParser<Statement> {
         return new Block(forStmts);
     }
 
-    // (Block | '\n'Statement)
-    private Statement controlFlowStatement() {
-        // Check if the next character is a left brace or new line. If so, proceed
-        if (!(check(TokenType.LEFT_BRACE) || check(TokenType.NEW_LINE))) {
-            throw new ParseLoxError("Expected '{' or new line after while condition",  tokens.previous().offset);
-        }
-
-        // Consume the new line if it exists
-        if (check(TokenType.NEW_LINE))
-            tokens.advance();
-
-        return breakStatement();
-    }
-
     /**
      * Helper function for parsing statements where break is allowed (i.e. for and while loops)
      * @return a statement
@@ -278,26 +251,11 @@ public class ParseStatement extends AbstractParser<Statement> {
     private Statement breakStatement() {
         if (check(TokenType.BREAK)) {
             tokens.advance();
-            ParseLoxError e = new ParseLoxError("Expected semicolon after break statement",  tokens.previous().offset);
-            checkAndAdvance(TokenType.SEMICOLON, e);
+            checkAndAdvance(TokenType.SEMICOLON, newError("Expected ';' after break statement"));
             return new BreakStatement();
         }
         return statement();
     }
-
-
-    /**
-     * Helper function for parsing for statement syntax. Parses (statement | ';')
-     * @return statement or null
-     */
-    private Statement forGetStatement() {
-        Statement stmt = null;
-        if (!check(TokenType.SEMICOLON)) {
-            stmt = statement();
-        }
-        return stmt;
-    }
-
 
     private Statement expressionStatement() {
         Expression value = exprParser.parse(this.tokens);
@@ -318,8 +276,7 @@ public class ParseStatement extends AbstractParser<Statement> {
         if (lvalue instanceof Variable) {
             Variable var = (Variable) lvalue;
             Expression rvalue = exprParser.parse(this.tokens);
-            ParseLoxError err =  new ParseLoxError("Expected ';' after value",  tokens.previous().offset);
-            checkAndAdvance(TokenType.SEMICOLON, err);
+            checkAndAdvance(TokenType.SEMICOLON, newError("Expected ';' after value"));
             return new VarAssign(var.name, rvalue);
 
         }
@@ -327,11 +284,7 @@ public class ParseStatement extends AbstractParser<Statement> {
 
     }
 
-    private Statement returnStatement() {
-        tokens.advance();
-        Expression value = exprParser.parse(this.tokens);
-        ParseLoxError err =  new ParseLoxError("Expected ';' after value",  tokens.previous().offset);
-        checkAndAdvance(TokenType.SEMICOLON, err);
-        return new ReturnStatement(value);
+    private ParseLoxError newError(String message) {
+        return new ParseLoxError(message, tokens.peek().offset);
     }
 }
