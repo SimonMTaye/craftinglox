@@ -11,13 +11,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class TestExpressionEvaluator {
 
     ExpressionEvaluator getEvaluator(Environment scope) {
-        StatementEvaluator statementEvaluator = new StatementEvaluator(scope);
-        return new ExpressionEvaluator(statementEvaluator);
+        Interpreter interpreter = new Interpreter(scope);
+        return new ExpressionEvaluator(interpreter);
     }
 
     ExpressionEvaluator getEvaluator() {
-        StatementEvaluator statementEvaluator = new StatementEvaluator();
-        return new ExpressionEvaluator(statementEvaluator);
+        Interpreter interpreter = new Interpreter();
+        return new ExpressionEvaluator(interpreter);
     }
     @Test
     void TestUnary() {

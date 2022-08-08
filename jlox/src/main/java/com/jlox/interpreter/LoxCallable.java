@@ -4,5 +4,5 @@ import java.util.List;
 
 interface LoxCallable {
     int arity();
-    Object call(StatementEvaluator stmtEval, List<Object> arguments);
+    Object call(Interpreter interpreter, List<Object> arguments);
 }

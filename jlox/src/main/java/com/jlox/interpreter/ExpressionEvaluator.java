@@ -8,10 +8,10 @@ import java.util.ArrayList;
 
 public class ExpressionEvaluator implements ExpressionVisitor<Object> {
 
-    private StatementEvaluator stmtEval;
+    private final Interpreter interpreter;
 
-    public ExpressionEvaluator(StatementEvaluator  stmtEval) {
-        this.stmtEval = stmtEval;
+    public ExpressionEvaluator(Interpreter  interpreter) {
+        this.interpreter = interpreter;
     }
 
     public Object evaluate(Expression expression) {
@@ -33,12 +33,12 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
                 throw new RuntimeError( "Expected a number.");
             }
         }
-        throw new RuntimeError( String.format("Unknown operator '%s'", unary.operator.lexme));
+        throw new RuntimeError( String.format("Unknown operator '%s'", unary.operator.lexeme));
     }
 
     @Override
     public Object visitVariable(Variable variable) {
-        return stmtEval.scope.getValue(variable.name);
+        return interpreter.getScope().getValue(variable.name);
     }
 
     @Override
@@ -58,7 +58,7 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
             throw new RuntimeError(String.format("Expected %d arguments but got %d.", function.arity(), arguments.size()));
         }
 
-        return function.call(stmtEval, arguments);
+        return function.call(interpreter, arguments);
     }
 
     @Override
@@ -86,7 +86,7 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
                 return operate(left, right, binary.operator);
             }
         }
-        throw new RuntimeError( String.format("%s is not supported for %s and %s", binary.operator.lexme, left.getClass(), right.getClass()));
+        throw new RuntimeError( String.format("%s is not supported for %s and %s", binary.operator.lexeme, left.getClass(), right.getClass()));
     }
 
     // Logical operator with short-circuiting
@@ -138,7 +138,7 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
         }
         if (!(left instanceof Integer) || !(right instanceof Integer)) {
             throw new RuntimeError( String.format("%s is not supported on %s and %s",
-                operator.lexme, left.getClass(), right.getClass()));
+                operator.lexeme, left.getClass(), right.getClass()));
         }
         return operate((Integer) left, (Integer) right, operator.type);
 

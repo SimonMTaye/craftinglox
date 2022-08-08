@@ -10,12 +10,12 @@ public class AstPrinter implements ExpressionVisitor<String> {
 
     @Override
     public String visitBinary(Binary binary) {
-        return String.format("(%s %s %s)", binary.operator.lexme, binary.left.accept(this), binary.right.accept(this));
+        return String.format("(%s %s %s)", binary.operator.lexeme, binary.left.accept(this), binary.right.accept(this));
     }
 
     @Override
     public String visitLogical(Logical logical) {
-        return String.format("(%s %s %s)", logical.operator.lexme, logical.left.accept(this), logical.right.accept(this));
+        return String.format("(%s %s %s)", logical.operator.lexeme, logical.left.accept(this), logical.right.accept(this));
     }
 
     @Override
@@ -40,12 +40,12 @@ public class AstPrinter implements ExpressionVisitor<String> {
 
     @Override
     public String visitUnary(Unary unary) {
-        return String.format("(%s %s)", unary.operator.lexme, unary.right.accept(this));
+        return String.format("(%s %s)", unary.operator.lexeme, unary.right.accept(this));
     }
 
     @Override
     public String visitVariable(Variable variable) {
-        return String.format("$(%s)", variable.name.lexme);
+        return String.format("$(%s)", variable.name.lexeme);
     }
 
     @Override

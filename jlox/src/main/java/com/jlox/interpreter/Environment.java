@@ -28,7 +28,7 @@ public class Environment {
      * @return the value stored for the variable
      */
     public Object getValue(Token name) {
-        return getValue(name.lexme);
+        return getValue(name.lexeme);
     }
 
     /**
@@ -37,10 +37,10 @@ public class Environment {
      * @param value the value of the variable
      */
     public void defineVariable(Token name, Object value) {
-        if (mappings.containsKey(name.lexme)) {
+        if (mappings.containsKey(name.lexeme)) {
             throw new RuntimeError(name + " has already been declared");
         }
-        mappings.put(name.lexme, value);
+        mappings.put(name.lexeme, value);
     }
 
     /**
@@ -49,12 +49,12 @@ public class Environment {
      * @param value the new value
      */
     public void changeValue(Token name, Object value) {
-        if (!mappings.containsKey(name.lexme)) {
+        if (!mappings.containsKey(name.lexeme)) {
             if (parent == null)
-                throw new RuntimeError("Undefined variable " + name.lexme);
+                throw new RuntimeError("Undefined variable " + name.lexeme);
             parent.changeValue(name, value);
         }
-        mappings.put(name.lexme, value);
+        mappings.put(name.lexeme, value);
     }
 
     private Object getValue(String key) {

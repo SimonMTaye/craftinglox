@@ -15,27 +15,18 @@ class TokenSource {
     }
 
     public boolean isAtEnd() {
-        if (next != null)
-            return false;
-        return !tokenIterator.hasNext();
+        return next == null && !tokenIterator.hasNext();
     }
 
     public Token advance() {
-        // We have already moved the iterator forward by using peek. Thus, we shouldn't do
-        // so again. Instead we should use the token stored in next
+        // If next != null, then we have consumed a token from the iterator that hasn't been returned yet
         if (next != null) {
-            // Set the previous to the token stored in next
             previous = next;
-            // Set next to null, indicating it has been consumed
             next = null;
-            // return previous which now contains the token previously stored in next
             return previous;
         }
-        // We have no token in next meaning we should advance the iterator
-        // We should store the result in previous in case we call previous()
-        // and need the token later
         if (isAtEnd())
-            throw new IllegalStateException("No tokens remaining");
+            throw new IllegalStateException("Cannot advance: no tokens remaining");
         previous = tokenIterator.next();
         return previous;
     }
@@ -48,7 +39,7 @@ class TokenSource {
 
     public Token peek() {
         if (isAtEnd()) {
-            throw new IllegalStateException("No tokens remaining");
+            throw new IllegalStateException("Cannot peek: no tokens remaining");
         }
         if (next == null) {
             next = tokenIterator.next();

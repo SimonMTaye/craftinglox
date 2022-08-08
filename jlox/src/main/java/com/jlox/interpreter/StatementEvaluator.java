@@ -5,50 +5,21 @@ import com.jlox.statement.*;
 
 public class StatementEvaluator implements StatementVisitor<Void> {
 
-    protected Environment scope;
     private final ExpressionEvaluator exprEval;
+    private final Interpreter interpreter;
 
 
-
-    public StatementEvaluator() {
-        this.scope = new Environment();
-        this.exprEval = new ExpressionEvaluator(this);
+    public StatementEvaluator(Interpreter interpreter) {
+        this.interpreter = interpreter;
+        this.exprEval = new ExpressionEvaluator(interpreter);
     }
-
-    public StatementEvaluator(Environment global) {
-        this.scope = global;
-        this.exprEval = new ExpressionEvaluator(this);
-    }
-
-
-    // Handle Scoping
-
-    /**
-     * Create a new nested scope
-     */
-    private void nestScope() {
-        scope = new Environment(scope);
-    }
-
-    /**
-     * Get to one higher scope
-     */
-    private void unnestScope() {
-        scope = scope.getHigherScope();
-    }
-
 
     public Void execute(Statement stmt) {
         stmt.accept(this);
         return null;
     }
 
-    public void executeScoped(Statement stmt, Environment scope) {
-        Environment oldScope = this.scope;
-        this.scope = scope;
-        execute(stmt);
-        this.scope = oldScope;
-    }
+
 
     @Override
     public Void visitPrintStatement(PrintStatement printstatement) {
@@ -64,25 +35,25 @@ public class StatementEvaluator implements StatementVisitor<Void> {
 
     @Override
     public Void visitVarDeclare(VarDeclare varDeclare) {
-        scope.defineVariable(varDeclare.name, exprEval.evaluate(varDeclare.init));
+        this.interpreter.getScope().defineVariable(varDeclare.name, exprEval.evaluate(varDeclare.init));
         return null;
     }
 
     @Override
     public Void visitVarAssign(VarAssign varAssign) {
-        scope.changeValue(varAssign.name, exprEval.evaluate(varAssign.newVal));
+        this.interpreter.getScope().changeValue(varAssign.name, exprEval.evaluate(varAssign.newVal));
         return null;
     }
 
     @Override
     public Void visitBlock(Block block) {
-        nestScope();
+        this.interpreter.nestScope();
         try {
             for (Statement stmt : block.stmts) {
                 execute(stmt);
             }
         } finally {
-            unnestScope();
+            this.interpreter.unnestScope();
         }
         return null;
     }
@@ -118,7 +89,7 @@ public class StatementEvaluator implements StatementVisitor<Void> {
 
     @Override
     public Void visitFunDeclare(FunDeclare fundeclare) {
-        scope.defineVariable(fundeclare.name, new LoxFunction(fundeclare));
+        this.interpreter.getScope().defineVariable(fundeclare.name, new LoxFunction(fundeclare));
         return null;
     }
 

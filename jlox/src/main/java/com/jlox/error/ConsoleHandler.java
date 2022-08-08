@@ -2,24 +2,30 @@ package com.jlox.error;
 
 public class ConsoleHandler implements IErrorHandler {
 
-    private boolean hasError = false;
+  private boolean hasError = false;
 
-    @Override
-    public void error(String message, String code) {
-        hasError = true;
-        System.out.println(message);
+  /***
+   * Logs the error to the screen
+   * 
+   * @param message: error message
+   * @param code:    error code associated with the error
+   ***/
+  @Override
+  public void error(String message, String code) {
+    hasError = true;
+    System.out.println(message);
 
-    }
+  }
 
-    public void error(LoxError loxError) {
-        hasError = true;
-        System.out.println(loxError.getMessage());
+  public void error(LoxError loxError) {
+    hasError = true;
+    System.out.println(loxError.getMessage());
 
-    }
+  }
 
-    @Override
-    public boolean hasError() {
-        return hasError;
-    }
+  @Override
+  public boolean hasError() {
+    return hasError;
+  }
 
 }

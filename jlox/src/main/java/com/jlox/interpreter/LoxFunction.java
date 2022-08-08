@@ -19,13 +19,14 @@ public class LoxFunction implements LoxCallable {
     }
 
     @Override
-    public Object call(StatementEvaluator smtEval, List<Object> arguments) {
-        Environment environment = new Environment(smtEval.scope);
+    public Object call(Interpreter interpreter, List<Object> arguments) {
+        interpreter.nestScope();
+        Environment environment = interpreter.getScope();
         for (int i = 0; i < declaration.params.size(); i++) {
             environment.defineVariable(declaration.params.get(i), arguments.get(i));
         }
         try {
-            smtEval.executeScoped(declaration.body, environment);
+            interpreter.execute(declaration.body);
         } catch (ReturnException returnValue) {
             return returnValue.value;
         }

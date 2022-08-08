@@ -284,7 +284,5 @@ public class ParseStatement extends AbstractParser<Statement> {
 
     }
 
-    private ParseLoxError newError(String message) {
-        return new ParseLoxError(message, tokens.peek().offset);
-    }
+
 }

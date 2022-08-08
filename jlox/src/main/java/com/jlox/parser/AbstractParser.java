@@ -33,10 +33,7 @@ public abstract class AbstractParser<R> {
      * Check if the next token matches the desired type
      */
     protected boolean check(TokenType type) {
-        if (tokens.isAtEnd()) {
-            return false;
-        }
-        return tokens.peek().type == type;
+        return !tokens.isAtEnd() && tokens.peek().type == type;
     }
 
     /**
@@ -51,6 +48,15 @@ public abstract class AbstractParser<R> {
             return tokens.advance();
         }
         throw message;
+    }
+
+    /**
+     * Create a new ParseError pointing to the previous Token with the desired message
+     * @param message error message
+     * @return the error
+     */
+    protected ParseLoxError newError(String message) {
+        return new ParseLoxError(message, tokens.previous().offset);
     }
 
     /**

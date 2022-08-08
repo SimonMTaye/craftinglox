@@ -12,32 +12,54 @@ public class Interpreter {
     private final StatementEvaluator stmtEval;
     private final IErrorHandler handler;
 
-    public Interpreter(IErrorHandler handler) {
-        this.handler = handler;
-        this.stmtEval = new StatementEvaluator();
-    }
+    private Environment scope;
 
     public Interpreter() {
-        this.handler = new ConsoleHandler();
-        Environment globals = new Environment();
-        this.stmtEval = new StatementEvaluator(globals);
-        globals.defineInterpreterGlobal("clock", new LoxCallable() {
+        this(new ConsoleHandler(), new Environment());
+    }
+    public Interpreter(Environment scope) {
+        this(new ConsoleHandler(), scope);
+    }
+
+    public Interpreter(IErrorHandler handler, Environment scope) {
+        this.handler = handler;
+        this.scope = scope;
+        this.stmtEval = new StatementEvaluator(this);
+        scope.defineInterpreterGlobal("clock", new LoxCallable() {
             @Override
             public int arity() {
                 return 0;
             }
 
             @Override
-            public Object call(StatementEvaluator statementEvaluator, List<Object> arguments) {
+            public Object call(Interpreter interpreter, List<Object> arguments) {
                 return System.currentTimeMillis();
             }
         });
     }
 
-    public Environment getScope() {
-        return stmtEval.scope;
+
+    public void nestScope() {
+        scope = new Environment(scope);
     }
 
+    public void unnestScope() {
+        scope = scope.getHigherScope();
+    }
+
+    public Environment getScope() {
+        return scope;
+    }
+
+    public void execute(Statement stmt) {
+        stmtEval.execute(stmt);
+    }
+
+    public void execute(List<Statement> stmts) {
+        for (Statement stmt : stmts) {
+            stmtEval.execute(stmt);
+        }
+    }
 
     public Void run(List<Statement> stmts) {
         try {
