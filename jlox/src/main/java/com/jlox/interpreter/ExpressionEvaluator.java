@@ -17,6 +17,7 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
     public Object evaluate(Expression expression) {
         return expression.accept(this);
     }
+
     @Override
     public Object visitUnary(Unary unary) {
         switch (unary.operator.type) {
@@ -81,8 +82,9 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
             case LESS:
                 return operate(left, right, binary.operator);
             case PLUS: {
-                if (left instanceof String || right instanceof String)
+                if (left instanceof String || right instanceof String) {
                     return left.toString() + right.toString();
+                }
                 return operate(left, right, binary.operator);
             }
         }
@@ -95,9 +97,13 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
         Object left = evaluate(logical.left);
         boolean truthy = isTruthy(left);
         if (logical.operator.type == TokenType.OR) {
-            if (truthy) return left;
+            if (truthy) {
+                return left;
+            }
         } else if (logical.operator.type == TokenType.AND) {
-            if (!truthy) return left;
+            if (!truthy) {
+                return left;
+            }
         }
         return evaluate(logical.right);
     }
@@ -121,8 +127,9 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
     }
 
     private boolean isTruthy(Object object) {
-        if (object == null)
+        if (object == null) {
             return false;
+        }
 
         if (object instanceof Boolean) {
             return (Boolean) object;
@@ -138,7 +145,7 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
         }
         if (!(left instanceof Integer) || !(right instanceof Integer)) {
             throw new RuntimeError( String.format("%s is not supported on %s and %s",
-                operator.lexeme, left.getClass(), right.getClass()));
+                    operator.lexeme, left.getClass(), right.getClass()));
         }
         return operate((Integer) left, (Integer) right, operator.type);
 

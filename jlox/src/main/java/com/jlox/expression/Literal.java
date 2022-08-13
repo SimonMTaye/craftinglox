@@ -6,13 +6,13 @@ import java.util.List;
 
 
 public class Literal extends Expression {
-	public final Object value;
+    public final Object value;
 
-	public Literal (Object value) {
-		this.value = value;
-	}
+    public Literal(Object value) {
+        this.value = value;
+    }
 
-	public <R> R accept(ExpressionVisitor<R> visitor) {
-		return visitor.visitLiteral(this);
-	}
+    public <R> R accept(ExpressionVisitor<R> visitor) {
+        return visitor.visitLiteral(this);
+    }
 }

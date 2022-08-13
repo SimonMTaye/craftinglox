@@ -37,6 +37,7 @@ public class TestScanner {
         assertEquals(token3, tokens.get(2));
         assertEquals(token4, tokens.get(3));
     }
+
     @Test
     void TestIdentifier() {
         List<Token> tokens = runScanner("word and orchid");
@@ -63,34 +64,34 @@ public class TestScanner {
     }
 
     @Test
-    void TestIntScan () {
+    void TestIntScan() {
         List<Token> tokens = runScanner("123");
         assertEquals(tokens.size(), 2);
         Token expectedToken = new Token(TokenType.INTEGER, "123", 123, 2);
-        assertEquals( expectedToken, tokens.get(0));
+        assertEquals(expectedToken, tokens.get(0));
 
     }
 
     @Test
-    void TestFloatFScan () {
+    void TestFloatFScan() {
         List<Token> tokens = runScanner("123d");
         assertEquals(tokens.size(), 2);
         Token expectedToken = new Token(TokenType.DOUBLE, "123d", 123d, 3);
-        assertEquals( expectedToken, tokens.get(0));
+        assertEquals(expectedToken, tokens.get(0));
 
     }
 
     @Test
-    void TestFloatDecimalScan () {
+    void TestFloatDecimalScan() {
         List<Token> tokens = runScanner("12.3");
         assertEquals(tokens.size(), 2);
         Token expectedToken = new Token(TokenType.DOUBLE, "12.3", 12.3, 3);
-        assertEquals( expectedToken, tokens.get(0));
+        assertEquals(expectedToken, tokens.get(0));
 
     }
 
     @Test
-    void TestMultipleScan () {
+    void TestMultipleScan() {
         List<Token> tokens = runScanner("123 12.3 \"Hello World\" > >= ");
         assertEquals(6, tokens.size());
         Token token1 = new Token(TokenType.INTEGER, "123", 123, 2);
@@ -98,17 +99,18 @@ public class TestScanner {
         // Compare Literal here as well since it is important
         Token token3 = new Token(TokenType.STRING, "\"Hello World\"", "Hello World", 21);
         Token token4 = new Token(TokenType.GREATER, ">", null, 23);
-            Token token5 = new Token(TokenType.GREATER_EQUAL, ">=", null, 26);
+        Token token5 = new Token(TokenType.GREATER_EQUAL, ">=", null, 26);
 
-            assertEquals(token1, tokens.get(0));
-            assertEquals(token2, tokens.get(1));
-            assertEquals(token3, tokens.get(2));
-            assertEquals(token4, tokens.get(3));
-            assertEquals(token5, tokens.get(4));
+        assertEquals(token1, tokens.get(0));
+        assertEquals(token2, tokens.get(1));
+        assertEquals(token3, tokens.get(2));
+        assertEquals(token4, tokens.get(3));
+        assertEquals(token5, tokens.get(4));
 
-        }
+    }
+
     @Test
-    void TestMultiLineScan () {
+    void TestMultiLineScan() {
         List<Token> tokens = runScanner("123 12.3 \"Hello World\" > >= \n;123 12.3 \"Hello World\" > >=");
         assertEquals(13, tokens.size());
         Token token1 = new Token(TokenType.INTEGER, "123", 123, 2);

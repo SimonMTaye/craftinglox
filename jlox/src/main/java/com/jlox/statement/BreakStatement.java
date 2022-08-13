@@ -8,10 +8,10 @@ import java.util.List;
 
 public class BreakStatement extends Statement {
 
-	public BreakStatement () {
-	}
+    public BreakStatement() {
+    }
 
-	public <R> R accept(StatementVisitor<R> visitor) {
-		return visitor.visitBreakStatement(this);
-	}
+    public <R> R accept(StatementVisitor<R> visitor) {
+        return visitor.visitBreakStatement(this);
+    }
 }

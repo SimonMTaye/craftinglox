@@ -59,10 +59,11 @@ public class TestEnvironment {
 
         // Test that variables defined in scopedEnv aren't available in the parent
         assertThrows(
-            RuntimeError.class,
-            () -> globalEnv.getValue(test2)
+                RuntimeError.class,
+                () -> globalEnv.getValue(test2)
         );
     }
+
     /**
      * Test that a global environment (i.e. one with no parents) throws an error when fetching or changing a variable
      * that isn't defined and re-defining an existing variable
@@ -73,21 +74,22 @@ public class TestEnvironment {
         Environment globalEnv = new Environment();
         Token test1 = getIdentifier("test1");
         assertThrows(
-            RuntimeError.class,
-            () -> globalEnv.getValue(test1)
+                RuntimeError.class,
+                () -> globalEnv.getValue(test1)
         );
 
         assertThrows(
-            RuntimeError.class,
-            () -> globalEnv.changeValue(test1, "Hello World")
+                RuntimeError.class,
+                () -> globalEnv.changeValue(test1, "Hello World")
         );
 
         globalEnv.defineVariable(test1,  "Hello World");
         assertThrows(
-            RuntimeError.class,
-            () -> globalEnv.defineVariable(test1, "Simon")
+                RuntimeError.class,
+                () -> globalEnv.defineVariable(test1, "Simon")
         );
     }
+
     /**
      * Test that a global environment throws and error when reassigning a variable that doesn't exist
      */
@@ -98,18 +100,18 @@ public class TestEnvironment {
         Token test1 = getIdentifier("test1");
         Environment scopedEnv = new Environment(globalEnv);
         assertThrows(
-            RuntimeError.class,
-            () -> scopedEnv.changeValue(test1, "Hello World")
+                RuntimeError.class,
+                () -> scopedEnv.changeValue(test1, "Hello World")
         );
         assertThrows(
-            RuntimeError.class,
-            () -> scopedEnv.getValue(test1)
+                RuntimeError.class,
+                () -> scopedEnv.getValue(test1)
         );
 
         scopedEnv.defineVariable(test1, "Hello World");
         assertThrows(
-            RuntimeError.class,
-            () -> scopedEnv.defineVariable(test1, "Simon")
+                RuntimeError.class,
+                () -> scopedEnv.defineVariable(test1, "Simon")
         );
     }
 

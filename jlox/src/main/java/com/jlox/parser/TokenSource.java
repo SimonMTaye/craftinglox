@@ -7,8 +7,8 @@ import java.util.Iterator;
 class TokenSource {
     private final Iterator<Token> tokenIterator;
 
-    private Token previous = null;
-    private Token next = null;
+    private Token previous;
+    private Token next;
 
     TokenSource(Iterable<Token> tokens) {
         this.tokenIterator = tokens.iterator();
@@ -25,15 +25,17 @@ class TokenSource {
             next = null;
             return previous;
         }
-        if (isAtEnd())
+        if (isAtEnd()) {
             throw new IllegalStateException("Cannot advance: no tokens remaining");
+        }
         previous = tokenIterator.next();
         return previous;
     }
 
     public Token previous() {
-        if (previous == null)
+        if (previous == null) {
             throw new IllegalStateException("previous() can't be used on first call");
+        }
         return previous;
     }
 
@@ -47,4 +49,3 @@ class TokenSource {
         return next;
     }
 }
-

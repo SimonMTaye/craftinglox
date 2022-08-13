@@ -18,7 +18,9 @@ public class Environment {
     }
 
     public Environment getHigherScope() {
-        if (this.parent != null) return this.parent;
+        if (this.parent != null) {
+            return this.parent;
+        }
         return this;
     }
 
@@ -50,16 +52,21 @@ public class Environment {
      */
     public void changeValue(Token name, Object value) {
         if (!mappings.containsKey(name.lexeme)) {
-            if (parent == null)
+            if (parent == null) {
                 throw new RuntimeError("Undefined variable " + name.lexeme);
+            }
             parent.changeValue(name, value);
         }
         mappings.put(name.lexeme, value);
     }
 
     private Object getValue(String key) {
-        if (this.mappings.containsKey(key)) return mappings.get(key);
-        if (this.parent != null) return parent.getValue(key);
+        if (this.mappings.containsKey(key)) {
+            return mappings.get(key);
+        }
+        if (this.parent != null) {
+            return parent.getValue(key);
+        }
         throw new RuntimeError(key + " is an undefined variable");
     }
 

@@ -14,8 +14,9 @@ public class StringSource implements ISourceInfo {
 
     @Override
     public char peek() {
-        if (isAtEnd())
+        if (isAtEnd()) {
             return '\0';
+        }
         return getString().charAt(current + 1);
     }
 
@@ -63,13 +64,15 @@ public class StringSource implements ISourceInfo {
     public int getLineNumber(int offset) {
         String myString = getString();
         int l = myString.length();
-        if (offset >= l)
+        if (offset >= l) {
             throw new RuntimeException("Offset is invalid");
+        }
 
         int acc = 1;
         // Count the number of times we see a new line
-        for (int i = 0; i <= offset; i++)
+        for (int i = 0; i <= offset; i++) {
             acc++;
+        }
         return acc;
 
     }
@@ -82,14 +85,15 @@ public class StringSource implements ISourceInfo {
     public int getColNumber(int offset) {
         String myString = getString();
         int l = myString.length();
-        if (offset >= l)
+        if (offset >= l) {
             throw new RuntimeException("Offset is invalid");
+        }
 
         myString = myString.substring(0, offset);
         // Get the position of the last new line
         int fin = myString.lastIndexOf('\n');
         // return the distance between that new line and our offset character
-        return (offset - fin);
+        return offset - fin;
     }
 
 }

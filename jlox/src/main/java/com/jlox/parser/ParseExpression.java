@@ -61,6 +61,7 @@ public class ParseExpression extends AbstractParser<Expression> {
     private Expression comma() {
         return binaryHelper((Void none) -> ternary(), TokenType.COMMA);
     }
+
     // ternary -> equality ? ternary : ternary | equality
     private Expression ternary() {
         Expression expr = logicalOr();
@@ -76,6 +77,7 @@ public class ParseExpression extends AbstractParser<Expression> {
         }
         return expr;
     }
+
     // logicalOr -> logicalAnd ('or' logicalAnd) *
     private Expression logicalOr() {
         Expression left = logicalAnd();
@@ -86,6 +88,7 @@ public class ParseExpression extends AbstractParser<Expression> {
         }
         return left;
     }
+
     // logicalAnd -> equality ('and' equality) *
     private Expression logicalAnd() {
         Expression left = equality();
@@ -96,23 +99,28 @@ public class ParseExpression extends AbstractParser<Expression> {
         }
         return left;
     }
+
     // equality -> comparison ( ('!=' | '==') comparison) *
     private Expression equality() {
         return binaryHelper((Void none) -> comparison(), TokenType.BANG_EQUAL, TokenType.EQUAL_EQUAL);
     }
+
     // comparison -> term ( ('>' | '>=' | '<' | '<=' ) term) *
     private Expression comparison() {
         return binaryHelper((Void none) -> term(), TokenType.GREATER, TokenType.GREATER_EQUAL, TokenType.LESS, TokenType.LESS_EQUAL);
 
     }
+
     // term -> factor ( ('-' | '+') factor ) *
     private Expression term() {
         return binaryHelper((Void none) -> factor(), TokenType.MINUS, TokenType.PLUS);
     }
+
     // factor -> unary ( ('/' | '*') unary ) *
     private Expression factor() {
         return binaryHelper((Void none) -> unary(), TokenType.SLASH, TokenType.STAR);
     }
+
     // unary -> ('!' | '-') unary | primary
     private Expression unary() {
         if (checkMultiple(TokenType.BANG, TokenType.MINUS)) {
@@ -127,7 +135,7 @@ public class ParseExpression extends AbstractParser<Expression> {
 
         if (check(TokenType.LEFT_PAREN)) {
             ArrayList<Expression> args = new ArrayList<>();
-            while(!check(TokenType.RIGHT_PAREN)) {
+            while (!check(TokenType.RIGHT_PAREN)) {
                 if (args.size() > 255) {
                     throw new ParseLoxError("Cannot have more than 255 arguments", tokens.peek().offset);
                 }
@@ -145,6 +153,7 @@ public class ParseExpression extends AbstractParser<Expression> {
         }
         return expr;
     }
+
     // primary -> NUMBER | STRING | 'true | 'false' | 'nil' | IDENTIFIER |  '(' expression ')'
     private Expression primary() {
         if (checkMultiple(TokenType.INTEGER, TokenType.DOUBLE, TokenType.STRING, TokenType.TRUE, TokenType.FALSE, TokenType.NIL)) {

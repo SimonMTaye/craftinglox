@@ -19,6 +19,7 @@ public class TestExpressionEvaluator {
         Interpreter interpreter = new Interpreter();
         return new ExpressionEvaluator(interpreter);
     }
+
     @Test
     void TestUnary() {
         Unary unary = new Unary(new Token(TokenType.BANG, "!", null, 0), new Literal(true));
@@ -39,6 +40,7 @@ public class TestExpressionEvaluator {
         Unary badNegation = new Unary(new Token(TokenType.MINUS, "-", null, 0), new Literal("Hello"));
         assertThrows(RuntimeError.class, () -> evaluate(badNegation));
     }
+
     @Test
     void TestBinary() {
         Binary binary = new Binary(new Literal(10), typeOnlyToken(TokenType.PLUS), new Literal(10));
@@ -95,6 +97,7 @@ public class TestExpressionEvaluator {
         binary = new Binary(new Literal(10), typeOnlyToken(TokenType.LESS), new Literal(100));
         assertEquals(true, evaluate(binary));
     }
+
     @Test
     void TestTernary() {
         Ternary ternary = new Ternary(new Literal(true), new Literal(1), new Literal(2));

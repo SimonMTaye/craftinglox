@@ -18,6 +18,7 @@ public class LoxScanner {
 
     private static final Map<Character, TokenType> singleCharTokens;
     private static final Map<String, TokenType> keywords;
+
     static {
         // Single Char List
         singleCharTokens = new HashMap<>();
@@ -79,8 +80,9 @@ public class LoxScanner {
     }
 
     public List<Token> scanTokens() {
-        while (!source.isAtEnd())
+        while (!source.isAtEnd()) {
             scanToken();
+        }
         addToken(TokenType.EOF);
         return tokens;
     }
@@ -137,8 +139,9 @@ public class LoxScanner {
 
     private boolean handleSingleChar(char c) {
         TokenType type = singleCharTokens.getOrDefault(c, null);
-        if (type == null)
+        if (type == null) {
             return false;
+        }
         addToken(type);
         return true;
     }
@@ -169,8 +172,9 @@ public class LoxScanner {
             if (nextMatch('/')) {
                 // Two '//' indicate a comment. Move forward till we hit the end of the line or
                 // the file is over
-                while (source.peek() != '\n' && source.isAtEnd())
+                while (source.peek() != '\n' && source.isAtEnd()) {
                     source.advance();
+                }
                 return true;
             }
             addToken(TokenType.SLASH);
@@ -182,8 +186,9 @@ public class LoxScanner {
     private boolean handleString(char c) {
         // 2 since we have consumed the initial ' " ' to get here and we just advanced
         // in the previous line
-        if (c != '"')
+        if (c != '"') {
             return false;
+        }
         int length = 1;
         char last = c;
         while (!source.isAtEnd() && source.peek() != '"') {
@@ -196,8 +201,9 @@ public class LoxScanner {
             length++;
         }
         int offset = source.getOffset();
-        if (last != '"')
-            reporter.error("Unterminated string",ERROR_UNTERMSTRING);
+        if (last != '"') {
+            reporter.error("Unterminated string", ERROR_UNTERMSTRING);
+        }
 
         String literal = source.get((offset - length) + 2, offset);
 
@@ -207,16 +213,18 @@ public class LoxScanner {
 
     private boolean handleNumbers(char c) {
 
-        if (!Character.isDigit(c))
+        if (!Character.isDigit(c)) {
             return  false;
+        }
 
         boolean isFloat = false;
         int length = 1;
         // Avoid repeated calls to source.peek()
         char next = source.peek();
         while (!source.isAtEnd() && (Character.isDigit(next) || next == '.')) {
-            if (next == '.')
+            if (next == '.') {
                 isFloat = true;
+            }
             length++;
             source.advance();
             next = source.peek();
@@ -229,16 +237,20 @@ public class LoxScanner {
             source.advance();
             length++;
         }
-        if (isFloat)
+        if (isFloat) {
             addToken(TokenType.DOUBLE, Double.parseDouble(literal), length);
-        else
+        }
+        else {
             addToken(TokenType.INTEGER, Integer.parseInt(literal), length);
+        }
         return true;
     }
+
     // Handle keywords and identifiers
     private boolean handleIdentifiers(char c) {
-        if (!Character.isAlphabetic(c))
+        if (!Character.isAlphabetic(c)) {
             return false;
+        }
 
         int length = 1;
         while (Character.isAlphabetic(source.peek()) || Character.isDigit(source.peek())) {
@@ -250,15 +262,17 @@ public class LoxScanner {
         addToken(type, null, length);
         return true;
     }
+
     // Handle tokens that don't fit anywhere else
     private void handleUnknown(char c) {
         if (hasInfo) {
             assert sourceI != null;
             reporter.error(String.format("Unexpected char %c at line %d col %d", c,
-                sourceI.getLineNumber(), sourceI.getColNumber()), ERROR_UNKOWNCHAR);
+                    sourceI.getLineNumber(), sourceI.getColNumber()), ERROR_UNKOWNCHAR);
         }
-        else
+        else {
             reporter.error(String.format("Unexpected char %c", c), ERROR_UNKOWNCHAR);
+        }
     }
 
     // Add a single/double-length token

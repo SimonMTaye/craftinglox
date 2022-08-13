@@ -7,15 +7,15 @@ import java.util.List;
 
 
 public class WhileStatement extends Statement {
-	public final Expression condition;
-	public final Statement body;
+    public final Expression condition;
+    public final Statement body;
 
-	public WhileStatement (Expression condition, Statement body) {
-		this.condition = condition;
-		this.body = body;
-	}
+    public WhileStatement(Expression condition, Statement body) {
+        this.condition = condition;
+        this.body = body;
+    }
 
-	public <R> R accept(StatementVisitor<R> visitor) {
-		return visitor.visitWhileStatement(this);
-	}
+    public <R> R accept(StatementVisitor<R> visitor) {
+        return visitor.visitWhileStatement(this);
+    }
 }

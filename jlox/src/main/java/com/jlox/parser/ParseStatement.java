@@ -20,7 +20,7 @@ public class ParseStatement extends AbstractParser<Statement> {
     /**
      * Default constructor where console handler is used for error handling
      */
-    public ParseStatement () {
+    public ParseStatement() {
         this.handler = new ConsoleHandler();
         this.exprParser = new ParseExpression(this.handler);
     }
@@ -68,6 +68,7 @@ public class ParseStatement extends AbstractParser<Statement> {
         TokenSource tokens = new TokenSource(tokenIterable);
         return parse(tokens);
     }
+
     /**
      * Parse a list of tokens as a single statement
      * @param tokens tokens to be parsed
@@ -98,11 +99,11 @@ public class ParseStatement extends AbstractParser<Statement> {
     private Statement declaration() {
         Token next = tokens.peek();
         switch (next.type) {
-           case VAR:
+            case VAR:
                 return varDeclaration();
-           case FUN:
+            case FUN:
                 return funDeclaration();
-           default:
+            default:
                 return statement();
         }
     }
@@ -110,7 +111,7 @@ public class ParseStatement extends AbstractParser<Statement> {
     private Statement varDeclaration() {
         // Consume var token
         tokens.advance();
-        Token name = checkAndAdvance(TokenType.IDENTIFIER,newError("Expected Identifier after var keyword"));
+        Token name = checkAndAdvance(TokenType.IDENTIFIER, newError("Expected Identifier after var keyword"));
         VarDeclare variable;
         // Initialize variable
         if (check(TokenType.EQUAL)) {
@@ -142,7 +143,9 @@ public class ParseStatement extends AbstractParser<Statement> {
                 Token param = checkAndAdvance(TokenType.IDENTIFIER, newError("Expected a valid Identifier after fun keyword"));
                 params.add(param);
                 // Stop iterating if next token is not comma
-                if (!check(TokenType.COMMA)) break;
+                if (!check(TokenType.COMMA)) {
+                    break;
+                }
                 tokens.advance();
             } while (true);
         }
@@ -171,6 +174,7 @@ public class ParseStatement extends AbstractParser<Statement> {
                 return expressionStatement();
         }
     }
+
     private Statement returnStatement() {
         tokens.advance();
         Expression value = exprParser.parse(this.tokens);
@@ -204,7 +208,7 @@ public class ParseStatement extends AbstractParser<Statement> {
     private Statement whileStatement() {
         tokens.advance();
         checkAndAdvance(TokenType.LEFT_PAREN, newError("Expected '(' after while keyword"));
-        Expression condition = check(TokenType.RIGHT_PAREN) ? null: exprParser.parse(this.tokens);
+        Expression condition = check(TokenType.RIGHT_PAREN) ? null : exprParser.parse(this.tokens);
         checkAndAdvance(TokenType.RIGHT_PAREN, newError("Expected ')' after expression"));
         return new WhileStatement(condition, breakStatement());
     }
@@ -235,11 +239,15 @@ public class ParseStatement extends AbstractParser<Statement> {
         // Transform into a while loop
         ArrayList<Statement> whileBody = new ArrayList<>();
         whileBody.add(body);
-        if (post != null) whileBody.add(post);
+        if (post != null) {
+            whileBody.add(post);
+        }
 
         WhileStatement whileStmt  = new WhileStatement(condition, new Block(whileBody));
         ArrayList<Statement> forStmts = new ArrayList<>();
-        if (init != null) forStmts.add(init);
+        if (init != null) {
+            forStmts.add(init);
+        }
         forStmts.add(whileStmt);
         return new Block(forStmts);
     }

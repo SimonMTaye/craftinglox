@@ -21,9 +21,9 @@ public class AstPrinter implements ExpressionVisitor<String> {
     @Override
     public String visitTernary(Ternary ternary) {
         return String.format("(if %s %s else %s)",
-            ternary.condition.accept(this),
-            ternary.left.accept(this),
-            ternary.right.accept(this)
+                ternary.condition.accept(this),
+                ternary.left.accept(this),
+                ternary.right.accept(this)
         );
     }
 
@@ -34,7 +34,9 @@ public class AstPrinter implements ExpressionVisitor<String> {
 
     @Override
     public String visitLiteral(Literal literal) {
-        if (literal.value == null) return "nil";
+        if (literal.value == null) {
+            return "nil";
+        }
         return literal.value.toString();
     }
 

@@ -39,7 +39,7 @@ public class TestStatementParser {
     // Call parser on tokens
     // assertThrows
     @Test
-    void TestVarAssign(){
+    void TestVarAssign() {
         ParseStatement parser = new ParseStatement();
         final Token[] badTokens = new Token[]{emptyToken(TokenType.IDENTIFIER), emptyToken(TokenType.EQUAL), emptyToken(TokenType.INTEGER)};
         assertThrows(RuntimeException.class, () -> parser.parse(List.of(badTokens)), "Expect error due to missing semicolon");

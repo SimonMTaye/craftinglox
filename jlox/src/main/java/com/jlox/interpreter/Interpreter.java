@@ -17,6 +17,7 @@ public class Interpreter {
     public Interpreter() {
         this(new ConsoleHandler(), new Environment());
     }
+
     public Interpreter(Environment scope) {
         this(new ConsoleHandler(), scope);
     }
@@ -72,4 +73,3 @@ public class Interpreter {
         return null;
     }
 }
-

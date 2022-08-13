@@ -7,13 +7,13 @@ import java.util.List;
 
 
 public class ExprStatement extends Statement {
-	public final Expression expr;
+    public final Expression expr;
 
-	public ExprStatement (Expression expr) {
-		this.expr = expr;
-	}
+    public ExprStatement(Expression expr) {
+        this.expr = expr;
+    }
 
-	public <R> R accept(StatementVisitor<R> visitor) {
-		return visitor.visitExprStatement(this);
-	}
+    public <R> R accept(StatementVisitor<R> visitor) {
+        return visitor.visitExprStatement(this);
+    }
 }

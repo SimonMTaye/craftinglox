@@ -6,17 +6,17 @@ import java.util.List;
 
 
 public class Logical extends Expression {
-	public final Expression left;
-	public final Token operator;
-	public final Expression right;
+    public final Expression left;
+    public final Token operator;
+    public final Expression right;
 
-	public Logical (Expression left, Token operator, Expression right) {
-		this.left = left;
-		this.operator = operator;
-		this.right = right;
-	}
+    public Logical(Expression left, Token operator, Expression right) {
+        this.left = left;
+        this.operator = operator;
+        this.right = right;
+    }
 
-	public <R> R accept(ExpressionVisitor<R> visitor) {
-		return visitor.visitLogical(this);
-	}
+    public <R> R accept(ExpressionVisitor<R> visitor) {
+        return visitor.visitLogical(this);
+    }
 }

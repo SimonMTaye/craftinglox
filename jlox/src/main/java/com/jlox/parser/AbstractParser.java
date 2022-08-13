@@ -18,13 +18,15 @@ public abstract class AbstractParser<R> {
     }
 
     abstract R parse(TokenSource tokens);
+
     /**
      * Check if the next token matches one of the provided types
      */
     protected boolean checkMultiple(TokenType... types) {
         for (TokenType type : types) {
-            if (check(type))
+            if (check(type)) {
                 return true;
+            }
         }
         return false;
     }
@@ -65,7 +67,9 @@ public abstract class AbstractParser<R> {
      */
     protected void synchronize() {
         while (!tokens.isAtEnd()) {
-            if (tokens.previous().type == TokenType.SEMICOLON) return;
+            if (tokens.previous().type == TokenType.SEMICOLON) {
+                return;
+            }
 
             switch (tokens.peek().type) {
                 case CLASS:
