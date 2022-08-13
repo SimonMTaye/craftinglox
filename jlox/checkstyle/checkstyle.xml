@@ -4,7 +4,7 @@
     <!-- Annotations -->
     <module name="SuppressionFilter">
         <property name="file" value="checkstyle/suppressions.xml" />
-        <property name="optional" value="true" />
+        <property name="optional" value="false" />
     </module>
     <!-- Allow suppressing with an annotation -->
     <module name="SuppressWarningsFilter" />
@@ -42,7 +42,7 @@
             <module name="HideUtilityClassConstructor" />
             <module name="InterfaceIsType" />
             <module name="OneTopLevelClass" />
-            <module name="VisibilityModifier" />
+                <!--<module name="VisibilityModifier" /> -->
             <!-- Coding -->
             <module name="CovariantEquals" />
             <module name="DeclarationOrder" />

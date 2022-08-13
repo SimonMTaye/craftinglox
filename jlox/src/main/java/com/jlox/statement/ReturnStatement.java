@@ -2,8 +2,6 @@ package com.jlox.statement;
 
 
 import com.jlox.expression.Expression;
-import com.jlox.scanner.Token;
-import java.util.List;
 
 
 public class ReturnStatement extends Statement {

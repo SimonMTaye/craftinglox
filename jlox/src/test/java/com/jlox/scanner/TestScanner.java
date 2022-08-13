@@ -1,16 +1,14 @@
 package com.jlox.scanner;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.List;
-
 import com.jlox.error.ConsoleHandler;
 import com.jlox.error.IErrorHandler;
 import com.jlox.scanner.source.ISource;
 import com.jlox.scanner.source.LineSource;
-
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestScanner {
 

@@ -11,7 +11,9 @@ test:
 
 .PHONY: validate
 validate:
-	mvn test -Dcheckstyle.skip
+	mvn validate
 
-gen-types: tools/packages/* tools/*.py
+gen-types-helper: tools/packages/* tools/*.py 
 	$(python) -m tools
+
+gen-types: gen-types-helper format

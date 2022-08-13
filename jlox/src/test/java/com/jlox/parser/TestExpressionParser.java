@@ -6,6 +6,7 @@ import com.jlox.expression.*;
 import com.jlox.scanner.Token;
 import com.jlox.scanner.TokenType;
 import org.junit.jupiter.api.Test;
+
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -92,12 +93,12 @@ public class TestExpressionParser {
         assertInstanceOf(Binary.class, result, "Expect evaluated expression to be a binary");
         assertInstanceOf(Grouping.class, ((Binary) result).right);
 
-        Grouping grouping = (Grouping) ((Binary) result).right;
+        Grouping grouping = (Grouping)((Binary)result).right;
 
         assertInstanceOf(Binary.class, grouping.expr);
 
         // This should contain 1 + (15 / 5)
-        Binary binary = (Binary) grouping.expr;
+        Binary binary = (Binary)grouping.expr;
         assertInstanceOf(Literal.class, binary.left);
         assertEquals(TokenType.PLUS, binary.operator.type);
         assertInstanceOf(Binary.class, binary.right);
@@ -158,16 +159,16 @@ public class TestExpressionParser {
         Expression result = parser.parse(tokens);
         assertInstanceOf(Ternary.class, result, "Expect evaluated expression to be a ternary");
 
-        Ternary first = (Ternary) result;
+        Ternary first = (Ternary)result;
         assertInstanceOf(Literal.class, first.condition, "Expect evaluated expression to be a ternary");
         assertInstanceOf(Ternary.class, first.left, "Expect evaluated expression to be a ternary");
         assertInstanceOf(Ternary.class, first.right, "Expect evaluated expression to be a ternary");
 
-        Ternary right = (Ternary) first.right;
+        Ternary right = (Ternary)first.right;
         assertInstanceOf(Literal.class, right.left, "Expect right.left expression to be a literal");
         assertInstanceOf(Literal.class, right.right, "Expect left.right expression to be a literal");
 
-        Ternary left = (Ternary) first.left;
+        Ternary left = (Ternary)first.left;
         assertInstanceOf(Literal.class, left.right, "Expect left.right expression to be a literal");
         assertInstanceOf(Ternary.class, left.left, "Expect left.right expression to be a literal");
         // End of checks. While this is not exhaustive,

@@ -3,7 +3,6 @@ $package com.jlox.statement;
 *import com.jlox.expression.Expression;
 *import com.jlox.scanner.Token;
 *import java.util.List;
-!src\main\java\com\jlox\statement
 PrintStatement Expression expr
 ExprStatement Expression expr
 VarDeclare Token name Expression init

@@ -4,13 +4,13 @@ import com.jlox.scanner.Token;
 import com.jlox.scanner.TokenType;
 import com.jlox.statement.PrintStatement;
 import com.jlox.statement.VarAssign;
-
 import com.jlox.statement.VarDeclare;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import java.util.List;
 
 
 public class TestStatementParser {

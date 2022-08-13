@@ -4,7 +4,8 @@ import com.jlox.scanner.Token;
 import com.jlox.scanner.TokenType;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class TestEnvironment {
 

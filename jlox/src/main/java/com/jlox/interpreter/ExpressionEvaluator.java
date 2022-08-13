@@ -26,15 +26,16 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
             case MINUS: {
                 Object right = unary.right.accept(this);
                 if (right instanceof Double) {
-                    return -1 * (Double) right;
+                    return -1 * (Double)right;
                 }
                 if (right instanceof Integer) {
-                    return -1 * (Integer) right;
+                    return -1 * (Integer)right;
                 }
                 throw new RuntimeError( "Expected a number.");
             }
+            default:
+                throw new RuntimeError( String.format("Unknown operator '%s'", unary.operator.lexeme));
         }
-        throw new RuntimeError( String.format("Unknown operator '%s'", unary.operator.lexeme));
     }
 
     @Override
@@ -48,7 +49,7 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
         if (!(callee instanceof LoxCallable)) {
             throw new RuntimeError(callee.toString() + "is not callable");
         }
-        LoxCallable function = (LoxCallable) callee;
+        LoxCallable function = (LoxCallable)callee;
 
         ArrayList<Object> arguments = new ArrayList<>();
         for (Expression expr : call.arguments) {
@@ -132,15 +133,15 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
         }
 
         if (object instanceof Boolean) {
-            return (Boolean) object;
+            return (Boolean)object;
         }
         throw new RuntimeError( "Expected a boolean.");
     }
 
     private Object operate(Object left, Object right, Token operator) {
         if (left instanceof Double || right instanceof Double) {
-            Number leftNum = (Number) left;
-            Number rightNum = (Number) right;
+            Number leftNum = (Number)left;
+            Number rightNum = (Number)right;
             return operate(leftNum.doubleValue(), rightNum.doubleValue(), operator.type);
         }
         if (!(left instanceof Integer) || !(right instanceof Integer)) {
@@ -173,8 +174,9 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
                 return left <= right;
             case LESS:
                 return left < right;
+            default:
+                return null;
         }
-        return null;
     }
 
     private Object operate(Integer left, Integer right, TokenType operator) {
@@ -199,7 +201,8 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
                 return left <= right;
             case LESS:
                 return left < right;
+            default:
+                return null;
         }
-        return null;
     }
 }

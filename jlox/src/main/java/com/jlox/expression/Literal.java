@@ -1,10 +1,6 @@
 package com.jlox.expression;
 
 
-import com.jlox.scanner.Token;
-import java.util.List;
-
-
 public class Literal extends Expression {
     public final Object value;
 

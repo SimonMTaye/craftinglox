@@ -1,13 +1,13 @@
 package com.jlox.scanner;
 
+import com.jlox.error.IErrorHandler;
+import com.jlox.scanner.source.ISource;
+import com.jlox.scanner.source.ISourceInfo;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import com.jlox.error.IErrorHandler;
-import com.jlox.scanner.source.ISource;
-import com.jlox.scanner.source.ISourceInfo;
 
 
 public class LoxScanner {
@@ -68,7 +68,7 @@ public class LoxScanner {
     public LoxScanner(ISource source, IErrorHandler reporter) {
         this.source = source;
         if (source instanceof ISourceInfo) {
-            sourceI = (ISourceInfo) source;
+            sourceI = (ISourceInfo)source;
             hasInfo = true;
         } else {
             sourceI = null;

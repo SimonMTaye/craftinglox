@@ -23,6 +23,6 @@ public class CollectorHandler implements IErrorHandler {
 
     @Override
     public boolean hasError() {
-        return !(reportedLoxErrors.size() == 0);
+        return !reportedLoxErrors.isEmpty();
     }
 }

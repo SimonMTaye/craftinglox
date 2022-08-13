@@ -6,7 +6,7 @@ from typing import Dict, Tuple, List
 from .data_class import DerivedClass, get_base_class
 
 # Package string
-ROOT = r"C:\Users\smtsi\Code\interpreter\jlox"
+ROOT = os.getcwd()
 Pair = Tuple[str, str]
 
 
@@ -15,9 +15,10 @@ def output(source: str) -> None:
     base_n = ""
     imports = ""
     package = ""
-    nested_dir = ""
+    output_dir = path.join(ROOT, "src", "main", "java", "com", "jlox")
     with open(source, "r") as src_file:
         base_n = src_file.readline()
+        output_dir = path.join(output_dir, base_n.lower().strip())
         base_n = base_n.strip(" \n")
         lines = src_file.readlines()
         for i, line in enumerate(lines):
@@ -27,13 +28,10 @@ def output(source: str) -> None:
             elif line.startswith("*"):
                 imports += line.strip("*\n")
                 imports += "\n"
-            elif line.startswith("!"):
-                nested_dir = line.strip("!\n")
-                continue
             else:
                 rem_lines = lines[i:]
                 break
-    generate_output(f"{ROOT}\\{nested_dir}", package, imports, base_n, "Visitor",
+    generate_output(output_dir, package, imports, base_n, "Visitor",
                     rem_lines)
 
 

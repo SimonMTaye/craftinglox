@@ -26,7 +26,7 @@ public class Token {
             return false;
         }
 
-        Token otherTk = (Token) oth;
+        Token otherTk = (Token)oth;
         return Objects.equals(literal, otherTk.literal)
                 && type == otherTk.type
                 && offset == otherTk.offset

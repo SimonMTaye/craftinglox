@@ -150,7 +150,7 @@ public class ParseStatement extends AbstractParser<Statement> {
             } while (true);
         }
         checkAndAdvance(TokenType.RIGHT_PAREN, newError("Expected closing ')'"));
-        return new FunDeclare(name, params, (Block) block());
+        return new FunDeclare(name, params, (Block)block());
 
     }
 
@@ -282,7 +282,7 @@ public class ParseStatement extends AbstractParser<Statement> {
 
     private Statement assignStatement(Expression lvalue) {
         if (lvalue instanceof Variable) {
-            Variable var = (Variable) lvalue;
+            Variable var = (Variable)lvalue;
             Expression rvalue = exprParser.parse(this.tokens);
             checkAndAdvance(TokenType.SEMICOLON, newError("Expected ';' after value"));
             return new VarAssign(var.name, rvalue);
