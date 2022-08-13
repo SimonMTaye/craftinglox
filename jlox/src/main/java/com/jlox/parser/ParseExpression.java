@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.function.Function;
 
 /**
- * Expression parser
+ * Expression parser.
  */
 public class ParseExpression extends AbstractParser<Expression> {
 
@@ -26,9 +26,9 @@ public class ParseExpression extends AbstractParser<Expression> {
         this.errorHandler = new ConsoleHandler();
     }
 
-
     /**
-     * Parses and arbitrarily nested expression and returns it. In the case of a syntactically incorrect sequence of
+     * Parses and arbitrarily nested expression and returns it. In the case of a
+     * syntactically incorrect sequence of
      * tokens, null is returned and the error is reported to the error handler
      *
      * @param tokens the sequence of tokens to parse
@@ -73,7 +73,7 @@ public class ParseExpression extends AbstractParser<Expression> {
                 Expression right = ternary();
                 return new Ternary(expr, left, right);
             }
-            throw  new ParseLoxError("Expected ':' to match '?'", tokens.previous().offset);
+            throw new ParseLoxError("Expected ':' to match '?'", tokens.previous().offset);
         }
         return expr;
     }
@@ -107,7 +107,8 @@ public class ParseExpression extends AbstractParser<Expression> {
 
     // comparison -> term ( ('>' | '>=' | '<' | '<=' ) term) *
     private Expression comparison() {
-        return binaryHelper((Void none) -> term(), TokenType.GREATER, TokenType.GREATER_EQUAL, TokenType.LESS, TokenType.LESS_EQUAL);
+        return binaryHelper((Void none) -> term(), TokenType.GREATER, TokenType.GREATER_EQUAL, TokenType.LESS,
+                TokenType.LESS_EQUAL);
 
     }
 
@@ -136,7 +137,7 @@ public class ParseExpression extends AbstractParser<Expression> {
         if (check(TokenType.LEFT_PAREN)) {
             ArrayList<Expression> args = new ArrayList<>();
             while (!check(TokenType.RIGHT_PAREN)) {
-                if (args.size() > 255) {
+                if (args.size() > MAX_ARGS) {
                     throw new ParseLoxError("Cannot have more than 255 arguments", tokens.peek().offset);
                 }
                 args.add(expression());
@@ -154,9 +155,11 @@ public class ParseExpression extends AbstractParser<Expression> {
         return expr;
     }
 
-    // primary -> NUMBER | STRING | 'true | 'false' | 'nil' | IDENTIFIER |  '(' expression ')'
+    // primary -> NUMBER | STRING | 'true | 'false' | 'nil' | IDENTIFIER | '('
+    // expression ')'
     private Expression primary() {
-        if (checkMultiple(TokenType.INTEGER, TokenType.DOUBLE, TokenType.STRING, TokenType.TRUE, TokenType.FALSE, TokenType.NIL)) {
+        if (checkMultiple(TokenType.INTEGER, TokenType.DOUBLE, TokenType.STRING, TokenType.TRUE, TokenType.FALSE,
+                TokenType.NIL)) {
             Token token = tokens.advance();
             return new Literal(token);
         }
@@ -172,12 +175,13 @@ public class ParseExpression extends AbstractParser<Expression> {
                 tokens.advance();
                 return grouping;
             }
-            throw new ParseLoxError("Expected a ')'",  tokens.previous().offset);
+            throw new ParseLoxError("Expected a ')'", tokens.previous().offset);
         }
-        throw new ParseLoxError("Expected an expression",  tokens.previous().offset);
+        throw new ParseLoxError("Expected an expression", tokens.previous().offset);
     }
 
-    // Helper method for matching pattern used in equality, comparison, term and factor
+    // Helper method for matching pattern used in equality, comparison, term and
+    // factor
     private Expression binaryHelper(Function<Void, Expression> operand, TokenType... operators) {
         Expression expr = operand.apply(null);
         // Get the next token if it matches what we want
@@ -189,6 +193,5 @@ public class ParseExpression extends AbstractParser<Expression> {
         }
         return expr;
     }
-
 
 }

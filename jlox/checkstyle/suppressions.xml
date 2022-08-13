@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE suppressions PUBLIC
-    "-//Puppy Crawl//DTD Suppressions 1.0//EN"
-    "http://checkstyle.sourceforge.net/dtds/suppressions_1_0.dtd">
+<!DOCTYPE suppressions PUBLIC "-//Puppy Crawl//DTD Suppressions 1.0//EN" "http://checkstyle.sourceforge.net/dtds/suppressions_1_0.dtd">
 <suppressions>
     <suppress files="[a-zA-Z0-9]*Test[a-zA-Z0-9]*.java$" checks="MagicNumber" />
     <suppress files="[a-zA-Z0-9]*Test[a-zA-Z0-9]*.java$" checks="MultipleStringLiterals" />
+    <suppress files="[a-zA-Z0-9]*Test[a-zA-Z0-9]*.java$" checks="Indentation" />
     <suppress files="[a-zA-Z0-9]*expression/[a-zA-Z0-9]*.java$" checks="EmptyLineSeparator" />
     <suppress files="[a-zA-Z0-9]*statement/[a-zA-Z0-9]*.java$" checks="EmptyLineSeparator" />
     <suppress files="[a-zA-Z0-9]*expression/[a-zA-Z0-9]*.java$" checks="RedundantModifier" />

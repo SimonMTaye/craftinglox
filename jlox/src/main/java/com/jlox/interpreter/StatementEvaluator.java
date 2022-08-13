@@ -1,13 +1,11 @@
 package com.jlox.interpreter;
 
-
 import com.jlox.statement.*;
 
 public class StatementEvaluator implements StatementVisitor<Void> {
 
     private final ExpressionEvaluator exprEval;
     private final Interpreter interpreter;
-
 
     public StatementEvaluator(Interpreter interpreter) {
         this.interpreter = interpreter;
@@ -18,7 +16,6 @@ public class StatementEvaluator implements StatementVisitor<Void> {
         stmt.accept(this);
         return null;
     }
-
 
     @Override
     public Void visitPrintStatement(PrintStatement printstatement) {
@@ -96,6 +93,5 @@ public class StatementEvaluator implements StatementVisitor<Void> {
     public Void visitReturnStatement(ReturnStatement returnstatement) {
         throw new ReturnException(exprEval.evaluate(returnstatement.value));
     }
-
 
 }

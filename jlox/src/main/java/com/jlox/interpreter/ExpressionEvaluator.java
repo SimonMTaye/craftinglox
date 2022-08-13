@@ -10,7 +10,7 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
 
     private final Interpreter interpreter;
 
-    public ExpressionEvaluator(Interpreter  interpreter) {
+    public ExpressionEvaluator(Interpreter interpreter) {
         this.interpreter = interpreter;
     }
 
@@ -23,18 +23,17 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
         switch (unary.operator.type) {
             case BANG:
                 return !isTruthy(unary.right.accept(this));
-            case MINUS: {
+            case MINUS:
                 Object right = unary.right.accept(this);
                 if (right instanceof Double) {
-                    return -1 * (Double)right;
+                    return -1 * (Double) right;
                 }
                 if (right instanceof Integer) {
-                    return -1 * (Integer)right;
+                    return -1 * (Integer) right;
                 }
-                throw new RuntimeError( "Expected a number.");
-            }
+                throw new RuntimeError("Expected a number.");
             default:
-                throw new RuntimeError( String.format("Unknown operator '%s'", unary.operator.lexeme));
+                throw new RuntimeError(String.format("Unknown operator '%s'", unary.operator.lexeme));
         }
     }
 
@@ -49,7 +48,7 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
         if (!(callee instanceof LoxCallable)) {
             throw new RuntimeError(callee.toString() + "is not callable");
         }
-        LoxCallable function = (LoxCallable)callee;
+        LoxCallable function = (LoxCallable) callee;
 
         ArrayList<Object> arguments = new ArrayList<>();
         for (Expression expr : call.arguments) {
@@ -57,7 +56,8 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
         }
 
         if (arguments.size() != function.arity()) {
-            throw new RuntimeError(String.format("Expected %d arguments but got %d.", function.arity(), arguments.size()));
+            throw new RuntimeError(
+                    String.format("Expected %d arguments but got %d.", function.arity(), arguments.size()));
         }
 
         return function.call(interpreter, arguments);
@@ -82,14 +82,16 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
             case LESS_EQUAL:
             case LESS:
                 return operate(left, right, binary.operator);
-            case PLUS: {
+            case PLUS:
                 if (left instanceof String || right instanceof String) {
                     return left.toString() + right.toString();
                 }
                 return operate(left, right, binary.operator);
-            }
+            default:
+
+                throw new RuntimeError(String.format("%s is not supported for %s and %s", binary.operator.lexeme,
+                        left.getClass(), right.getClass()));
         }
-        throw new RuntimeError( String.format("%s is not supported for %s and %s", binary.operator.lexeme, left.getClass(), right.getClass()));
     }
 
     // Logical operator with short-circuiting
@@ -133,19 +135,19 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
         }
 
         if (object instanceof Boolean) {
-            return (Boolean)object;
+            return (Boolean) object;
         }
-        throw new RuntimeError( "Expected a boolean.");
+        throw new RuntimeError("Expected a boolean.");
     }
 
     private Object operate(Object left, Object right, Token operator) {
         if (left instanceof Double || right instanceof Double) {
-            Number leftNum = (Number)left;
-            Number rightNum = (Number)right;
+            Number leftNum = (Number) left;
+            Number rightNum = (Number) right;
             return operate(leftNum.doubleValue(), rightNum.doubleValue(), operator.type);
         }
         if (!(left instanceof Integer) || !(right instanceof Integer)) {
-            throw new RuntimeError( String.format("%s is not supported on %s and %s",
+            throw new RuntimeError(String.format("%s is not supported on %s and %s",
                     operator.lexeme, left.getClass(), right.getClass()));
         }
         return operate((Integer) left, (Integer) right, operator.type);
@@ -160,12 +162,11 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
                 return left * right;
             case PLUS:
                 return left + right;
-            case SLASH: {
+            case SLASH:
                 if (right.equals(0d)) {
-                    throw new RuntimeError( "Cannot divide by 0");
+                    throw new RuntimeError("Cannot divide by 0");
                 }
                 return left / right;
-            }
             case GREATER:
                 return left > right;
             case GREATER_EQUAL:
@@ -187,12 +188,12 @@ public class ExpressionEvaluator implements ExpressionVisitor<Object> {
                 return left * right;
             case PLUS:
                 return left + right;
-            case SLASH: {
+            case SLASH:
                 if (right.equals(0)) {
-                    throw new RuntimeError( "Cannot divide by 0");
+                    throw new RuntimeError("Cannot divide by 0");
                 }
                 return left / right;
-            }
+
             case GREATER:
                 return left > right;
             case GREATER_EQUAL:

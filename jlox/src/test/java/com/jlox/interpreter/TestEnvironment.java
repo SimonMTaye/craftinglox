@@ -14,10 +14,11 @@ public class TestEnvironment {
     }
 
     /**
-     * Test that a global environment (i.e. one with no parents) assigns value as expected
+     * Test that a global environment (i.e. one with no parents) assigns value as
+     * expected
      */
     @Test
-    void TestGlobalAssign() {
+    void testGlobalAssign() {
         // Check that a value is assigned correctly
         Environment globalEnv = new Environment();
         Token test1 = getIdentifier("test1");
@@ -26,7 +27,7 @@ public class TestEnvironment {
     }
 
     @Test
-    void TestGlobalReAssign() {
+    void testGlobalReAssign() {
         // Check that a value is assigned correctly
         Environment globalEnv = new Environment();
         Token test1 = getIdentifier("test1");
@@ -36,7 +37,7 @@ public class TestEnvironment {
     }
 
     @Test
-    void TestScopedAssignAndReassign() {
+    void testScopedAssignAndReassign() {
         // Check that a value is assigned correctly
         Environment globalEnv = new Environment();
         Token test1 = getIdentifier("test1");
@@ -61,59 +62,54 @@ public class TestEnvironment {
         // Test that variables defined in scopedEnv aren't available in the parent
         assertThrows(
                 RuntimeError.class,
-                () -> globalEnv.getValue(test2)
-        );
+                () -> globalEnv.getValue(test2));
     }
 
     /**
-     * Test that a global environment (i.e. one with no parents) throws an error when fetching or changing a variable
+     * Test that a global environment (i.e. one with no parents) throws an error
+     * when fetching or changing a variable
      * that isn't defined and re-defining an existing variable
      */
     @Test
-    void TestGlobalAssignError() {
+    void testGlobalAssignError() {
         // Check that a value is assigned correctly
         Environment globalEnv = new Environment();
         Token test1 = getIdentifier("test1");
         assertThrows(
                 RuntimeError.class,
-                () -> globalEnv.getValue(test1)
-        );
+                () -> globalEnv.getValue(test1));
 
         assertThrows(
                 RuntimeError.class,
-                () -> globalEnv.changeValue(test1, "Hello World")
-        );
+                () -> globalEnv.changeValue(test1, "Hello World"));
 
-        globalEnv.defineVariable(test1,  "Hello World");
+        globalEnv.defineVariable(test1, "Hello World");
         assertThrows(
                 RuntimeError.class,
-                () -> globalEnv.defineVariable(test1, "Simon")
-        );
+                () -> globalEnv.defineVariable(test1, "Simon"));
     }
 
     /**
-     * Test that a global environment throws and error when reassigning a variable that doesn't exist
+     * Test that a global environment throws and error when reassigning a variable
+     * that doesn't exist.
      */
     @Test
-    void TestScopedError() {
+    void testScopedError() {
         // Check that a value is assigned correctly
         Environment globalEnv = new Environment();
         Token test1 = getIdentifier("test1");
         Environment scopedEnv = new Environment(globalEnv);
         assertThrows(
                 RuntimeError.class,
-                () -> scopedEnv.changeValue(test1, "Hello World")
-        );
+                () -> scopedEnv.changeValue(test1, "Hello World"));
         assertThrows(
                 RuntimeError.class,
-                () -> scopedEnv.getValue(test1)
-        );
+                () -> scopedEnv.getValue(test1));
 
         scopedEnv.defineVariable(test1, "Hello World");
         assertThrows(
                 RuntimeError.class,
-                () -> scopedEnv.defineVariable(test1, "Simon")
-        );
+                () -> scopedEnv.defineVariable(test1, "Simon"));
     }
 
 }

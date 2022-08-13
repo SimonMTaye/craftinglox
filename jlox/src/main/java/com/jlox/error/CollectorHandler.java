@@ -3,7 +3,7 @@ package com.jlox.error;
 import java.util.ArrayList;
 
 /**
- * Collects all the errors it recieves
+ * Collects all the errors it recieves.
  */
 public class CollectorHandler implements IErrorHandler {
 

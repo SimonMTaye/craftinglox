@@ -12,39 +12,47 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-
 public class TestStatementParser {
 
     @Test
-    void TestVarDeclration() {
+    void testVarDeclration() {
         ParseStatement parser = new ParseStatement();
-        final Token[] badTokens = new Token[]{emptyToken(TokenType.VAR), emptyToken(TokenType.IDENTIFIER), emptyToken(TokenType.EQUAL), emptyToken(TokenType.INTEGER)};
-        assertThrows(ParseLoxError.class, () -> parser.parse(List.of(badTokens)), "Expect error due to missing semicolon");
+        final Token[] badTokens = new Token[] { emptyToken(TokenType.VAR), emptyToken(TokenType.IDENTIFIER),
+                emptyToken(TokenType.EQUAL), emptyToken(TokenType.INTEGER) };
+        assertThrows(ParseLoxError.class, () -> parser.parse(List.of(badTokens)),
+                "Expect error due to missing semicolon");
 
-        final Token[] tokens = new Token[]{emptyToken(TokenType.VAR), emptyToken(TokenType.IDENTIFIER), emptyToken(TokenType.EQUAL), emptyToken(TokenType.INTEGER), emptyToken(TokenType.SEMICOLON)};
+        final Token[] tokens = new Token[] { emptyToken(TokenType.VAR), emptyToken(TokenType.IDENTIFIER),
+                emptyToken(TokenType.EQUAL), emptyToken(TokenType.INTEGER), emptyToken(TokenType.SEMICOLON) };
         assertInstanceOf(VarDeclare.class, parser.parse(List.of(tokens)), "Expected variable declaration statement");
     }
 
     @Test
-    void TestPrintStatement() {
+    void testPrintStatement() {
         ParseStatement parser = new ParseStatement();
-        final Token[] badTokens = new Token[]{emptyToken(TokenType.PRINT), emptyToken(TokenType.INTEGER)};
-        assertThrows(ParseLoxError.class, () -> parser.parse(List.of(badTokens)), "Expect error due to missing semicolon");
+        final Token[] badTokens = new Token[] { emptyToken(TokenType.PRINT), emptyToken(TokenType.INTEGER) };
+        assertThrows(ParseLoxError.class, () -> parser.parse(List.of(badTokens)),
+                "Expect error due to missing semicolon");
 
-        final Token[] tokens = new Token[]{emptyToken(TokenType.PRINT), emptyToken(TokenType.INTEGER), emptyToken(TokenType.SEMICOLON)};
-        assertInstanceOf(PrintStatement.class, parser.parse(List.of(tokens)), "Expected variable declaration statement");
+        final Token[] tokens = new Token[] { emptyToken(TokenType.PRINT), emptyToken(TokenType.INTEGER),
+                emptyToken(TokenType.SEMICOLON) };
+        assertInstanceOf(PrintStatement.class, parser.parse(List.of(tokens)),
+                "Expected variable declaration statement");
     }
 
     // Initialize a list of emptyTokens of type identifier, equal, integer
     // Call parser on tokens
     // assertThrows
     @Test
-    void TestVarAssign() {
+    void testVarAssign() {
         ParseStatement parser = new ParseStatement();
-        final Token[] badTokens = new Token[]{emptyToken(TokenType.IDENTIFIER), emptyToken(TokenType.EQUAL), emptyToken(TokenType.INTEGER)};
-        assertThrows(RuntimeException.class, () -> parser.parse(List.of(badTokens)), "Expect error due to missing semicolon");
+        final Token[] badTokens = new Token[] { emptyToken(TokenType.IDENTIFIER), emptyToken(TokenType.EQUAL),
+                emptyToken(TokenType.INTEGER) };
+        assertThrows(RuntimeException.class, () -> parser.parse(List.of(badTokens)),
+                "Expect error due to missing semicolon");
 
-        final Token[] tokens = new Token[]{emptyToken(TokenType.IDENTIFIER), emptyToken(TokenType.EQUAL), emptyToken(TokenType.INTEGER), emptyToken(TokenType.SEMICOLON)};
+        final Token[] tokens = new Token[] { emptyToken(TokenType.IDENTIFIER), emptyToken(TokenType.EQUAL),
+                emptyToken(TokenType.INTEGER), emptyToken(TokenType.SEMICOLON) };
         assertInstanceOf(VarAssign.class, parser.parse(List.of(tokens)), "Expected variable declaration statement");
 
     }

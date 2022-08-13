@@ -5,8 +5,8 @@ public class ConsoleHandler implements IErrorHandler {
     private boolean hasError;
 
     /***
-     * Logs the error to the screen
-     * 
+     * Logs the error to the screen.
+     *
      * @param message: error message
      * @param code:    error code associated with the error
      ***/

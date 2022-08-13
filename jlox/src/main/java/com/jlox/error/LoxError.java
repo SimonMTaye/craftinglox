@@ -1,6 +1,5 @@
 package com.jlox.error;
 
-
 public class LoxError extends RuntimeException {
     private final String message;
     private final String code;

@@ -21,7 +21,7 @@ public class TestExpressionEvaluator {
     }
 
     @Test
-    void TestUnary() {
+    void testUnary() {
         Unary unary = new Unary(new Token(TokenType.BANG, "!", null, 0), new Literal(true));
         assertEquals(false, evaluate(unary), "Expected '!true' to evaluate to false");
 
@@ -42,7 +42,7 @@ public class TestExpressionEvaluator {
     }
 
     @Test
-    void TestBinary() {
+    void testBinary() {
         Binary binary = new Binary(new Literal(10), typeOnlyToken(TokenType.PLUS), new Literal(10));
         assertEquals(20, evaluate(binary));
 
@@ -99,28 +99,32 @@ public class TestExpressionEvaluator {
     }
 
     @Test
-    void TestTernary() {
+    void testTernary() {
         Ternary ternary = new Ternary(new Literal(true), new Literal(1), new Literal(2));
         assertEquals(1, evaluate(ternary));
 
         ternary = new Ternary(new Literal(false), new Literal(1), new Literal(2));
         assertEquals(2, evaluate(ternary));
 
-        ternary = new Ternary(new Literal(true), new Ternary(new Literal(true), new Literal(1), new Literal(2)), new Literal(3));
+        ternary = new Ternary(new Literal(true),
+                new Ternary(new Literal(true), new Literal(1), new Literal(2)), new Literal(3));
         assertEquals(1, evaluate(ternary));
 
-        ternary = new Ternary(new Literal(true), new Ternary(new Literal(false), new Literal(1), new Literal(2)), new Literal(3));
+        ternary = new Ternary(new Literal(true), new Ternary(new Literal(false), new Literal(1), new Literal(2)),
+                new Literal(3));
         assertEquals(2, evaluate(ternary));
 
-        ternary = new Ternary(new Literal(false), new Ternary(new Literal(true), new Literal(1), new Literal(2)), new Literal(3));
+        ternary = new Ternary(new Literal(false), new Ternary(new Literal(true), new Literal(1), new Literal(2)),
+                new Literal(3));
         assertEquals(3, evaluate(ternary));
 
-        Ternary invalid = new Ternary(new Literal("Hello"), new Ternary(new Literal(true), new Literal(1), new Literal(2)), new Literal(3));
+        Ternary invalid = new Ternary(new Literal("Hello"),
+                new Ternary(new Literal(true), new Literal(1), new Literal(2)), new Literal(3));
         assertThrows(RuntimeError.class, () -> evaluate(invalid));
     }
 
     @Test
-    void TestVariables() {
+    void testVariables() {
         Environment scope = new Environment();
         Variable test1 = new Variable(getIdentifier("test1"));
         scope.defineVariable(test1.name, true);

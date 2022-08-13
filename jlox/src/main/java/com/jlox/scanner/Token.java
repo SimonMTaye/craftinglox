@@ -17,7 +17,8 @@ public class Token {
     }
 
     public String toString() {
-        return String.format("Type: %s\t Lexme: %s\t Offset: %d\t Literal: %s", type, lexeme, offset, (literal != null) ? literal.toString() : "none");
+        return String.format("Type: %s\t Lexme: %s\t Offset: %d\t Literal: %s",
+                type, lexeme, offset, (literal != null) ? literal.toString() : "none");
     }
 
     @Override
@@ -26,7 +27,7 @@ public class Token {
             return false;
         }
 
-        Token otherTk = (Token)oth;
+        Token otherTk = (Token) oth;
         return Objects.equals(literal, otherTk.literal)
                 && type == otherTk.type
                 && offset == otherTk.offset

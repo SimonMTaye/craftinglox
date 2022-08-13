@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class TestExpressionParser {
     @Test
-    void TestLiteral() {
+    void testLiteral() {
         ArrayList<Token> tokens = new ArrayList<>();
         tokens.add(new Token(TokenType.STRING, "\"Hello World\"", "Hello World", 10));
         ParseExpression parser = new ParseExpression();
@@ -22,7 +22,7 @@ public class TestExpressionParser {
     }
 
     @Test
-    void TestLiteralGrouping() {
+    void testLiteralGrouping() {
         ArrayList<Token> tokens = new ArrayList<>();
         IErrorHandler handler = new CollectorHandler();
         ParseExpression parser = new ParseExpression(handler);
@@ -32,16 +32,17 @@ public class TestExpressionParser {
         Expression result = parser.parse(tokens);
         assertNull(result, "Expect parse to return null");
         assertTrue(handler.hasError());
-        // Add the right paren, making the expression syntactically correct and try parsing again
+        // Add the right paren, making the expression syntactically correct and try
+        // parsing again
         tokens.add(new Token(TokenType.RIGHT_PAREN, ")", null, 1));
         result = parser.parse(tokens);
         assertInstanceOf(Grouping.class, result);
-        Grouping res = (Grouping)  result;
+        Grouping res = (Grouping) result;
         assertInstanceOf(Literal.class, res.expr);
     }
 
     @Test
-    void TestUnary() {
+    void testUnary() {
         ArrayList<Token> tokens = new ArrayList<>();
         IErrorHandler handler = new CollectorHandler();
         ParseExpression parser = new ParseExpression(handler);
@@ -56,7 +57,7 @@ public class TestExpressionParser {
     }
 
     @Test
-    void TestTerm() {
+    void testTerm() {
         ArrayList<Token> tokens = new ArrayList<>();
         IErrorHandler handler = new CollectorHandler();
         ParseExpression parser = new ParseExpression(handler);
@@ -73,7 +74,7 @@ public class TestExpressionParser {
 
     // Tests factor, grouping, term and equality
     @Test
-    void TestMultiple() {
+    void testMultiple() {
         ArrayList<Token> tokens = new ArrayList<>();
         IErrorHandler handler = new CollectorHandler();
         ParseExpression parser = new ParseExpression(handler);
@@ -93,12 +94,12 @@ public class TestExpressionParser {
         assertInstanceOf(Binary.class, result, "Expect evaluated expression to be a binary");
         assertInstanceOf(Grouping.class, ((Binary) result).right);
 
-        Grouping grouping = (Grouping)((Binary)result).right;
+        Grouping grouping = (Grouping) ((Binary) result).right;
 
         assertInstanceOf(Binary.class, grouping.expr);
 
         // This should contain 1 + (15 / 5)
-        Binary binary = (Binary)grouping.expr;
+        Binary binary = (Binary) grouping.expr;
         assertInstanceOf(Literal.class, binary.left);
         assertEquals(TokenType.PLUS, binary.operator.type);
         assertInstanceOf(Binary.class, binary.right);
@@ -106,7 +107,7 @@ public class TestExpressionParser {
     }
 
     @Test
-    void TestTernary() {
+    void testTernary() {
         ArrayList<Token> tokens = new ArrayList<>();
         IErrorHandler handler = new CollectorHandler();
         ParseExpression parser = new ParseExpression(handler);
@@ -126,7 +127,7 @@ public class TestExpressionParser {
     }
 
     @Test
-    void TestNestedTernary() {
+    void testNestedTernary() {
         ArrayList<Token> tokens = new ArrayList<>();
         IErrorHandler handler = new CollectorHandler();
         ParseExpression parser = new ParseExpression(handler);
@@ -159,16 +160,16 @@ public class TestExpressionParser {
         Expression result = parser.parse(tokens);
         assertInstanceOf(Ternary.class, result, "Expect evaluated expression to be a ternary");
 
-        Ternary first = (Ternary)result;
+        Ternary first = (Ternary) result;
         assertInstanceOf(Literal.class, first.condition, "Expect evaluated expression to be a ternary");
         assertInstanceOf(Ternary.class, first.left, "Expect evaluated expression to be a ternary");
         assertInstanceOf(Ternary.class, first.right, "Expect evaluated expression to be a ternary");
 
-        Ternary right = (Ternary)first.right;
+        Ternary right = (Ternary) first.right;
         assertInstanceOf(Literal.class, right.left, "Expect right.left expression to be a literal");
         assertInstanceOf(Literal.class, right.right, "Expect left.right expression to be a literal");
 
-        Ternary left = (Ternary)first.left;
+        Ternary left = (Ternary) first.left;
         assertInstanceOf(Literal.class, left.right, "Expect left.right expression to be a literal");
         assertInstanceOf(Ternary.class, left.left, "Expect left.right expression to be a literal");
         // End of checks. While this is not exhaustive,
@@ -176,7 +177,7 @@ public class TestExpressionParser {
     }
 
     @Test
-    void TestComma() {
+    void testComma() {
         ArrayList<Token> tokens = new ArrayList<>();
         IErrorHandler handler = new CollectorHandler();
         ParseExpression parser = new ParseExpression(handler);
@@ -192,7 +193,7 @@ public class TestExpressionParser {
     }
 
     @Test
-    void TestComparison() {
+    void testComparison() {
         ArrayList<Token> tokens = new ArrayList<>();
         IErrorHandler handler = new CollectorHandler();
         ParseExpression parser = new ParseExpression(handler);
@@ -204,7 +205,6 @@ public class TestExpressionParser {
         Expression result = parser.parse(tokens);
         assertInstanceOf(Binary.class, result);
         assertEquals(TokenType.GREATER, ((Binary) result).operator.type);
-
 
     }
 }

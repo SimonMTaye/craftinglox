@@ -39,7 +39,6 @@ public class Interpreter {
         });
     }
 
-
     public void nestScope() {
         scope = new Environment(scope);
     }

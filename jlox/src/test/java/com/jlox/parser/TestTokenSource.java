@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class TestTokenSource {
 
     @Test
-    void TestAdvancePreviousPeek() {
+    void testAdvancePreviousPeek() {
 
         ArrayList<Token> tokens = new ArrayList<>();
         for (int i = 0; i < 3; i++) {
@@ -34,11 +34,10 @@ public class TestTokenSource {
         assertEquals(1, source.previous().offset);
         assertEquals(2, source.advance().offset);
 
-
     }
 
     @Test
-    void TestPreviousException() {
+    void testPreviousException() {
 
         ArrayList<Token> tokens = new ArrayList<>();
         TokenSource source = new TokenSource(tokens);
@@ -48,7 +47,7 @@ public class TestTokenSource {
     }
 
     @Test
-    void TestPeekOnFinalException() {
+    void testPeekOnFinalException() {
         ArrayList<Token> tokens = new ArrayList<>();
         TokenSource source = new TokenSource(tokens);
 

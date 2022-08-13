@@ -9,53 +9,51 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 public class LoxScanner {
 
     // Error Codes
     public static final String ERROR_UNTERMSTRING = "ERR_UNTERMINATED_STRING";
     public static final String ERROR_UNKOWNCHAR = "ERR_UNKNOWN_CHAR";
 
-    private static final Map<Character, TokenType> singleCharTokens;
-    private static final Map<String, TokenType> keywords;
+    private static final Map<Character, TokenType> SINGLE_CHAR_TOKENS;
+    private static final Map<String, TokenType> KEYWORDS;
 
     static {
         // Single Char List
-        singleCharTokens = new HashMap<>();
-        singleCharTokens.put('(', TokenType.LEFT_PAREN);
-        singleCharTokens.put(')', TokenType.RIGHT_PAREN);
-        singleCharTokens.put('{', TokenType.LEFT_BRACE);
-        singleCharTokens.put('}', TokenType.RIGHT_BRACE);
-        singleCharTokens.put('.', TokenType.DOT);
-        singleCharTokens.put(',', TokenType.COMMA);
-        singleCharTokens.put('-', TokenType.MINUS);
-        singleCharTokens.put('+', TokenType.PLUS);
-        singleCharTokens.put('*', TokenType.STAR);
-        singleCharTokens.put(';', TokenType.SEMICOLON);
-        singleCharTokens.put('\n', TokenType.NEW_LINE);
-        singleCharTokens.put('?', TokenType.QUESTION_MARK);
-        singleCharTokens.put(':', TokenType.COLON);
+        SINGLE_CHAR_TOKENS = new HashMap<>();
+        SINGLE_CHAR_TOKENS.put('(', TokenType.LEFT_PAREN);
+        SINGLE_CHAR_TOKENS.put(')', TokenType.RIGHT_PAREN);
+        SINGLE_CHAR_TOKENS.put('{', TokenType.LEFT_BRACE);
+        SINGLE_CHAR_TOKENS.put('}', TokenType.RIGHT_BRACE);
+        SINGLE_CHAR_TOKENS.put('.', TokenType.DOT);
+        SINGLE_CHAR_TOKENS.put(',', TokenType.COMMA);
+        SINGLE_CHAR_TOKENS.put('-', TokenType.MINUS);
+        SINGLE_CHAR_TOKENS.put('+', TokenType.PLUS);
+        SINGLE_CHAR_TOKENS.put('*', TokenType.STAR);
+        SINGLE_CHAR_TOKENS.put(';', TokenType.SEMICOLON);
+        SINGLE_CHAR_TOKENS.put('\n', TokenType.NEW_LINE);
+        SINGLE_CHAR_TOKENS.put('?', TokenType.QUESTION_MARK);
+        SINGLE_CHAR_TOKENS.put(':', TokenType.COLON);
         // Keyword list
-        keywords = new HashMap<>();
-        keywords.put("and", TokenType.AND);
-        keywords.put("class", TokenType.CLASS);
-        keywords.put("else", TokenType.ELSE);
-        keywords.put("false", TokenType.FALSE);
-        keywords.put("for", TokenType.FOR);
-        keywords.put("fun", TokenType.FUN);
-        keywords.put("if", TokenType.IF);
-        keywords.put("nil", TokenType.NIL);
-        keywords.put("or", TokenType.OR);
-        keywords.put("print", TokenType.PRINT);
-        keywords.put("return", TokenType.RETURN);
-        keywords.put("super", TokenType.SUPER);
-        keywords.put("this", TokenType.THIS);
-        keywords.put("true", TokenType.TRUE);
-        keywords.put("var", TokenType.VAR);
-        keywords.put("while", TokenType.WHILE);
-        keywords.put("break", TokenType.BREAK);
+        KEYWORDS = new HashMap<>();
+        KEYWORDS.put("and", TokenType.AND);
+        KEYWORDS.put("class", TokenType.CLASS);
+        KEYWORDS.put("else", TokenType.ELSE);
+        KEYWORDS.put("false", TokenType.FALSE);
+        KEYWORDS.put("for", TokenType.FOR);
+        KEYWORDS.put("fun", TokenType.FUN);
+        KEYWORDS.put("if", TokenType.IF);
+        KEYWORDS.put("nil", TokenType.NIL);
+        KEYWORDS.put("or", TokenType.OR);
+        KEYWORDS.put("print", TokenType.PRINT);
+        KEYWORDS.put("return", TokenType.RETURN);
+        KEYWORDS.put("super", TokenType.SUPER);
+        KEYWORDS.put("this", TokenType.THIS);
+        KEYWORDS.put("true", TokenType.TRUE);
+        KEYWORDS.put("var", TokenType.VAR);
+        KEYWORDS.put("while", TokenType.WHILE);
+        KEYWORDS.put("break", TokenType.BREAK);
     }
-
 
     private final ISource source;
     private final IErrorHandler reporter;
@@ -64,11 +62,10 @@ public class LoxScanner {
     private final ISourceInfo sourceI;
     private final boolean hasInfo;
 
-
     public LoxScanner(ISource source, IErrorHandler reporter) {
         this.source = source;
         if (source instanceof ISourceInfo) {
-            sourceI = (ISourceInfo)source;
+            sourceI = (ISourceInfo) source;
             hasInfo = true;
         } else {
             sourceI = null;
@@ -138,7 +135,7 @@ public class LoxScanner {
     }
 
     private boolean handleSingleChar(char c) {
-        TokenType type = singleCharTokens.getOrDefault(c, null);
+        TokenType type = SINGLE_CHAR_TOKENS.getOrDefault(c, null);
         if (type == null) {
             return false;
         }
@@ -231,7 +228,7 @@ public class LoxScanner {
         }
         int offsetPlusOne = source.getOffset() + 1;
         // offsetPlusOne because offset returns a 0-indexed position
-        String literal = source.get((offsetPlusOne - length), offsetPlusOne);
+        String literal = source.get(offsetPlusOne - length, offsetPlusOne);
         if (source.peek() == 'd') {
             isFloat = true;
             source.advance();
@@ -239,10 +236,10 @@ public class LoxScanner {
         }
         if (isFloat) {
             addToken(TokenType.DOUBLE, Double.parseDouble(literal), length);
-        }
-        else {
+        } else {
             addToken(TokenType.INTEGER, Integer.parseInt(literal), length);
         }
+
         return true;
     }
 
@@ -258,7 +255,7 @@ public class LoxScanner {
             length++;
         }
         String identifier = source.get((source.getOffset()  - length) + 1, source.getOffset() + 1);
-        TokenType type = keywords.getOrDefault(identifier, TokenType.IDENTIFIER);
+        TokenType type = KEYWORDS.getOrDefault(identifier, TokenType.IDENTIFIER);
         addToken(type, null, length);
         return true;
     }
@@ -269,8 +266,7 @@ public class LoxScanner {
             assert sourceI != null;
             reporter.error(String.format("Unexpected char %c at line %d col %d", c,
                     sourceI.getLineNumber(), sourceI.getColNumber()), ERROR_UNKOWNCHAR);
-        }
-        else {
+        } else {
             reporter.error(String.format("Unexpected char %c", c), ERROR_UNKOWNCHAR);
         }
     }

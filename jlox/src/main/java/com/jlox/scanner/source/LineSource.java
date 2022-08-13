@@ -9,8 +9,8 @@ public class LineSource extends StringSource {
         this.line = line;
     }
 
-    public void changeLine(String line) {
-        this.line = line;
+    public void changeLine(String inputLine) {
+        this.line = inputLine;
     }
 
     @Override

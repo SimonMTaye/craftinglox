@@ -56,11 +56,6 @@ public class StringSource implements ISourceInfo {
     }
 
     @Override
-    public int getColNumber() {
-        return col;
-    }
-
-    @Override
     public int getLineNumber(int offset) {
         String myString = getString();
         int l = myString.length();
@@ -77,8 +72,9 @@ public class StringSource implements ISourceInfo {
 
     }
 
-    protected String getString() {
-        return source;
+    @Override
+    public int getColNumber() {
+        return col;
     }
 
     @Override
@@ -94,6 +90,10 @@ public class StringSource implements ISourceInfo {
         int fin = myString.lastIndexOf('\n');
         // return the distance between that new line and our offset character
         return offset - fin;
+    }
+
+    protected String getString() {
+        return source;
     }
 
 }

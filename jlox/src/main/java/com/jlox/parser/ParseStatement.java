@@ -18,7 +18,7 @@ public class ParseStatement extends AbstractParser<Statement> {
     private final ParseExpression exprParser;
 
     /**
-     * Default constructor where console handler is used for error handling
+     * Default constructor where console handler is used for error handling.
      */
     public ParseStatement() {
         this.handler = new ConsoleHandler();
@@ -26,7 +26,8 @@ public class ParseStatement extends AbstractParser<Statement> {
     }
 
     /**
-     * Create a ParseStatement that uses the provided error handler
+     * Create a ParseStatement that uses the provided error handler.
+     *
      * @param handler the desired error handler
      */
     public ParseStatement(IErrorHandler handler) {
@@ -35,7 +36,8 @@ public class ParseStatement extends AbstractParser<Statement> {
     }
 
     /**
-     * Parse tokens continuously until token stream is empty
+     * Parse tokens continuously until token stream is empty.
+     *
      * @param tokens token iterable
      * @return List of statements
      */
@@ -45,7 +47,8 @@ public class ParseStatement extends AbstractParser<Statement> {
     }
 
     /**
-     * Parse tokens continuously until token stream is empty
+     * Parse tokens continuously until token stream is empty.
+     *
      * @param tokens token source
      * @return List of statements
      */
@@ -58,9 +61,9 @@ public class ParseStatement extends AbstractParser<Statement> {
         return stmts;
     }
 
-
     /**
-     * Parse an iterable stream of tokens
+     * Parse an iterable stream of tokens.
+     *
      * @param tokenIterable iterable tokens
      * @return Statement
      */
@@ -70,7 +73,8 @@ public class ParseStatement extends AbstractParser<Statement> {
     }
 
     /**
-     * Parse a list of tokens as a single statement
+     * Parse a list of tokens as a single statement.
+     *
      * @param tokens tokens to be parsed
      * @return a statement defined by the tokens
      */
@@ -89,7 +93,7 @@ public class ParseStatement extends AbstractParser<Statement> {
             while (!check(TokenType.RIGHT_PAREN) && !tokens.isAtEnd()) {
                 stmts.add(parse());
             }
-            ParseLoxError err = new ParseLoxError("Expected closing '}'",  tokens.previous().offset);
+            ParseLoxError err = new ParseLoxError("Expected closing '}'", tokens.previous().offset);
             checkAndAdvance(TokenType.RIGHT_PAREN, err);
             return new Block(stmts);
         }
@@ -121,7 +125,7 @@ public class ParseStatement extends AbstractParser<Statement> {
             variable = new VarDeclare(name, init);
 
         } else {
-            // If there's no initializer, create  a null variable
+            // If there's no initializer, create a null variable
             variable = new VarDeclare(name, new Literal(TokenType.NIL));
         }
         // Check for semicolon
@@ -137,10 +141,11 @@ public class ParseStatement extends AbstractParser<Statement> {
         List<Token> params = new ArrayList<>();
         if (!check(TokenType.RIGHT_PAREN)) {
             do {
-                if (params.size() >= 255) {
+                if (params.size() >= MAX_ARGS) {
                     throw new ParseLoxError("Cannot have more than 255 parameters", tokens.previous().offset);
                 }
-                Token param = checkAndAdvance(TokenType.IDENTIFIER, newError("Expected a valid Identifier after fun keyword"));
+                Token param = checkAndAdvance(TokenType.IDENTIFIER,
+                        newError("Expected a valid Identifier after fun keyword"));
                 params.add(param);
                 // Stop iterating if next token is not comma
                 if (!check(TokenType.COMMA)) {
@@ -150,7 +155,7 @@ public class ParseStatement extends AbstractParser<Statement> {
             } while (true);
         }
         checkAndAdvance(TokenType.RIGHT_PAREN, newError("Expected closing ')'"));
-        return new FunDeclare(name, params, (Block)block());
+        return new FunDeclare(name, params, (Block) block());
 
     }
 
@@ -169,7 +174,7 @@ public class ParseStatement extends AbstractParser<Statement> {
                 return returnStatement();
             case BREAK:
                 tokens.advance();
-                throw new ParseLoxError("break statements may only appear within a for or while loop",  next.offset);
+                throw new ParseLoxError("break statements may only appear within a for or while loop", next.offset);
             default:
                 return expressionStatement();
         }
@@ -213,8 +218,8 @@ public class ParseStatement extends AbstractParser<Statement> {
         return new WhileStatement(condition, breakStatement());
     }
 
-
-    // Grammar FOR (Expression)?; (Expression)? ; (Expression)? (Block | '\n'Statement)
+    // Grammar FOR (Expression)?; (Expression)? ; (Expression)? (Block |
+    // '\n'Statement)
     private Statement forStatement() {
         tokens.advance();
 
@@ -243,7 +248,7 @@ public class ParseStatement extends AbstractParser<Statement> {
             whileBody.add(post);
         }
 
-        WhileStatement whileStmt  = new WhileStatement(condition, new Block(whileBody));
+        WhileStatement whileStmt = new WhileStatement(condition, new Block(whileBody));
         ArrayList<Statement> forStmts = new ArrayList<>();
         if (init != null) {
             forStmts.add(init);
@@ -253,7 +258,9 @@ public class ParseStatement extends AbstractParser<Statement> {
     }
 
     /**
-     * Helper function for parsing statements where break is allowed (i.e. for and while loops)
+     * Helper function for parsing statements where break is allowed (i.e. for and
+     * while loops)
+     *
      * @return a statement
      */
     private Statement breakStatement() {
@@ -276,21 +283,20 @@ public class ParseStatement extends AbstractParser<Statement> {
                 tokens.advance();
                 return assignStatement(value);
             default:
-                throw new ParseLoxError("Expected ';' after value",  tokens.previous().offset);
+                throw new ParseLoxError("Expected ';' after value", tokens.previous().offset);
         }
     }
 
     private Statement assignStatement(Expression lvalue) {
         if (lvalue instanceof Variable) {
-            Variable var = (Variable)lvalue;
+            Variable var = (Variable) lvalue;
             Expression rvalue = exprParser.parse(this.tokens);
             checkAndAdvance(TokenType.SEMICOLON, newError("Expected ';' after value"));
             return new VarAssign(var.name, rvalue);
 
         }
-        throw new ParseLoxError("Cannot assign value to " + lvalue.toString(),  tokens.previous().offset);
+        throw new ParseLoxError("Cannot assign value to " + lvalue.toString(), tokens.previous().offset);
 
     }
-
 
 }
